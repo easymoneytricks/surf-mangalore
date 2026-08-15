@@ -1,0 +1,201 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  color-scheme: dark;
+
+  /* Brand palette */
+  --color-primary: #7ad6d1;
+  --color-primary-strong: #4fc3b8;
+  --color-secondary: #0f2a3d;
+  --color-accent: #ff8f4a;
+  --color-accent-soft: rgba(255, 143, 74, 0.16);
+  --color-background: #04131b;
+  --color-surface: #081c28;
+  --color-surface-strong: #112d3c;
+  --color-surface-soft: #173447;
+  --color-muted: #6f8694;
+  --color-success: #5bcf9b;
+  --color-warning: #ffc36b;
+  --color-danger: #ff6f6f;
+  --color-text: #f4f8fb;
+  --color-text-secondary: #aac0cc;
+  --color-border: rgba(255, 255, 255, 0.12);
+
+  /* Gradients */
+  --gradient-hero: linear-gradient(135deg, #0b2634 0%, #123d50 45%, #7ad6d1 100%);
+  --gradient-surface: linear-gradient(135deg, rgba(122, 214, 209, 0.2) 0%, rgba(255, 143, 74, 0.12) 100%);
+  --gradient-accent: linear-gradient(90deg, var(--color-primary) 0%, var(--color-accent) 100%);
+
+  /* Typography */
+  --font-heading: 'Sora', 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Outfit', 'Inter', 'Segoe UI', sans-serif;
+  --font-display: 700;
+  --font-semibold: 600;
+  --font-medium: 500;
+  --font-regular: 400;
+  --display-size: clamp(3rem, 6vw, 5.5rem);
+  --h1-size: clamp(2.25rem, 4vw, 3.25rem);
+  --h2-size: clamp(1.75rem, 3vw, 2.25rem);
+  --h3-size: 1.35rem;
+  --h4-size: 1.05rem;
+  --body-large-size: 1.125rem;
+  --body-size: 1rem;
+  --small-size: 0.875rem;
+  --caption-size: 0.75rem;
+  --letter-tight: -0.03em;
+  --letter-normal: 0em;
+  --letter-wide: 0.16em;
+  --line-tight: 1.1;
+  --line-normal: 1.5;
+  --line-relaxed: 1.7;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+  --space-40: 10rem;
+  --space-48: 12rem;
+  --space-64: 16rem;
+  --space-80: 20rem;
+  --space-96: 24rem;
+  --space-128: 32rem;
+
+  /* Radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.9rem;
+  --radius-lg: 1.4rem;
+  --radius-xl: 2rem;
+  --radius-pill: 999px;
+
+  /* Shadows */
+  --shadow-small: 0 10px 30px rgba(4, 19, 27, 0.18);
+  --shadow-medium: 0 20px 40px rgba(4, 19, 27, 0.24);
+  --shadow-large: 0 32px 72px rgba(4, 19, 27, 0.34);
+  --shadow-glass: 0 18px 45px rgba(4, 19, 27, 0.24);
+
+  /* Layout */
+  --container-sm: 40rem;
+  --container-md: 64rem;
+  --container-lg: 80rem;
+  --section-spacing: 6rem;
+  --grid-gap: 1.5rem;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+
+  /* Motion */
+  --duration-fast: 160ms;
+  --duration-base: 240ms;
+  --duration-slow: 360ms;
+  --easing-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-base: var(--duration-base) var(--easing-standard);
+
+  font-family: var(--font-body);
+  line-height: var(--line-normal);
+  font-weight: var(--font-regular);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(122, 214, 209, 0.2), transparent 24%),
+    linear-gradient(135deg, var(--color-background) 0%, var(--color-surface) 100%);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+
+body,
+p,
+h1,
+h2,
+h3,
+h4,
+button,
+a {
+  margin: 0;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  min-height: 2.75rem;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(122, 214, 209, 0.8);
+  outline-offset: 2px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: rgba(122, 214, 209, 0.35);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --section-spacing: 4.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

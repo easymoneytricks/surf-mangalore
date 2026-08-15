@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="Instructor placeholder image">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b2230"/>
+      <stop offset="60%" stop-color="#19485c"/>
+      <stop offset="100%" stop-color="#3f7b7a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <circle cx="1050" cy="350" r="126" fill="#f4f8fb" fill-opacity="0.16"/>
+  <path d="M860 680c34-124 112-198 220-198 114 0 186 76 214 198" fill="#f4f8fb" fill-opacity="0.12"/>
+  <path d="M0 760C188 708 370 698 578 730C776 760 942 836 1146 830C1322 824 1488 782 1600 748V1000H0V760Z" fill="#081d2b" fill-opacity="0.9"/>
+  <text x="84" y="126" fill="#f4f8fb" font-family="Sora, Arial, sans-serif" font-size="72" font-weight="700" letter-spacing="10">INSTRUCTOR</text>
+  <text x="86" y="182" fill="#d1e6ee" font-family="Outfit, Arial, sans-serif" font-size="26" letter-spacing="6">SURF MANGALORE PLACEHOLDER</text>
+</svg>

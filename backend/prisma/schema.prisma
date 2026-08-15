@@ -1,0 +1,1157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================================
+// Enums
+// ==========================================================
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  VIEWER
+  CONTENT_MANAGER
+  SUPPORT
+  OPERATIONS
+}
+
+enum PublishStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  UNPUBLISHED
+  ARCHIVED
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+  UNLISTED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  REJECTED
+  NO_SHOW
+  REFUNDED
+}
+
+enum BookingType {
+  LESSON
+  EXPERIENCE
+  EVENT
+}
+
+enum BookingActivityAction {
+  CREATED
+  STATUS_CHANGED
+  UPDATED
+  CANCELLED
+}
+
+enum EventStatus {
+  DRAFT
+  SCHEDULED
+  LIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum EventDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  ALL_LEVELS
+}
+
+enum EventType {
+  WORKSHOP
+  CAMP
+  RETREAT
+  COMPETITION
+  COMMUNITY
+  PRIVATE_SESSION
+  OTHER
+}
+
+enum CurrencyCode {
+  INR
+  USD
+  EUR
+  GBP
+}
+
+enum LessonLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  ALL_LEVELS
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+  AUDIO
+  EMBED
+}
+
+enum ContactMessageStatus {
+  NEW
+  IN_REVIEW
+  RESOLVED
+  SPAM
+  ARCHIVED
+}
+
+enum BookingSource {
+  WEBSITE
+  ADMIN
+  PHONE
+  WHATSAPP
+  PARTNER
+}
+
+enum NavigationType {
+  HEADER
+  FOOTER
+  SIDEBAR
+}
+
+enum SiteSettingType {
+  STRING
+  NUMBER
+  BOOLEAN
+  JSON
+}
+
+enum PaymentStatus {
+  UNPAID
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+// ==========================================================
+// Shared Scalability Entities
+// ==========================================================
+
+model Locale {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  code        String   @unique
+  name        String
+  isDefault   Boolean  @default(false)
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  seoPages       SEOPage[]
+  navigations    Navigation[]
+  footerLinks    FooterLink[]
+  galleryImages  GalleryImage[]
+  faqs           FAQ[]
+  testimonials   Testimonial[]
+
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model Beach {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  slug        String   @unique
+  name        String
+  title       String
+  description String?
+  status      String   @default("active")
+  latitude    Decimal? @db.Decimal(10, 7)
+  longitude   Decimal? @db.Decimal(10, 7)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  lessons      Lesson[]
+  experiences  ExperienceBeach[]
+  events       Event[]
+  coaches      CoachBeach[]
+  bookings     Booking[]
+  mediaAssets  Media[]
+
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model Location {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  slug        String   @unique
+  name        String
+  title       String
+  description String?
+  status      String   @default("active")
+  addressLine String?
+  city        String?
+  region      String?
+  country     String?
+  postalCode  String?
+  latitude    Decimal? @db.Decimal(10, 7)
+  longitude   Decimal? @db.Decimal(10, 7)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  events      Event[]
+  bookings    Booking[]
+
+  @@index([status])
+  @@index([city])
+  @@index([deletedAt])
+}
+
+// ==========================================================
+// Access Control
+// ==========================================================
+
+model AdminUser {
+  id               Int        @id @default(autoincrement())
+  uuid             String     @unique @default(uuid())
+  slug             String     @unique
+  name             String
+  title            String?
+  description      String?
+  email            String     @unique
+  passwordHash     String
+  avatar           String?
+  phone            String?
+  status           String     @default("active")
+  userRole         UserRole   @default(ADMIN)
+  mustChangePassword Boolean  @default(false)
+  lastLoginAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  deletedAt        DateTime?
+
+  roles            AdminUserRole[]
+  sessions         AdminSession[]
+  auditLogs        AuditLog[]  @relation("AuditLogActor")
+  createdLessons   Lesson[]             @relation("LessonCreatedBy")
+  updatedLessons   Lesson[]             @relation("LessonUpdatedBy")
+  createdExperiences Experience[]       @relation("ExperienceCreatedBy")
+  updatedExperiences Experience[]       @relation("ExperienceUpdatedBy")
+  createdEvents    Event[]              @relation("EventCreatedBy")
+  updatedEvents    Event[]              @relation("EventUpdatedBy")
+  createdCoaches   Coach[]              @relation("CoachCreatedBy")
+  updatedCoaches   Coach[]              @relation("CoachUpdatedBy")
+  createdImages    GalleryImage[]       @relation("GalleryImageCreatedBy")
+  updatedImages    GalleryImage[]       @relation("GalleryImageUpdatedBy")
+  createdFaqs      FAQ[]                @relation("FAQCreatedBy")
+  updatedFaqs      FAQ[]                @relation("FAQUpdatedBy")
+  createdTestimonials Testimonial[]     @relation("TestimonialCreatedBy")
+  updatedTestimonials Testimonial[]     @relation("TestimonialUpdatedBy")
+  createdMedia     Media[]              @relation("MediaCreatedBy")
+  updatedMedia     Media[]              @relation("MediaUpdatedBy")
+  createdSeoPages  SEOPage[]            @relation("SEOPageCreatedBy")
+  updatedSeoPages  SEOPage[]            @relation("SEOPageUpdatedBy")
+  createdNavigations Navigation[]       @relation("NavigationCreatedBy")
+  updatedNavigations Navigation[]       @relation("NavigationUpdatedBy")
+  createdFooterLinks FooterLink[]       @relation("FooterLinkCreatedBy")
+  updatedFooterLinks FooterLink[]       @relation("FooterLinkUpdatedBy")
+  createdSiteSettings SiteSetting[]     @relation("SiteSettingCreatedBy")
+  updatedSiteSettings SiteSetting[]     @relation("SiteSettingUpdatedBy")
+  bookingActivities  BookingActivity[]
+
+  @@index([status])
+  @@index([userRole])
+  @@index([deletedAt])
+}
+
+model AdminSession {
+  id                Int      @id @default(autoincrement())
+  uuid              String   @unique @default(uuid())
+  slug              String?  @unique
+  name              String?
+  title             String?
+  description       String?
+  status            String   @default("active")
+  adminUserId       Int
+  refreshTokenHash  String
+  expiresAt         DateTime
+  revokedAt         DateTime?
+  lastUsedAt        DateTime?
+  ipAddress         String?
+  userAgent         String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  deletedAt         DateTime?
+
+  adminUser         AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+
+  @@index([adminUserId])
+  @@index([expiresAt])
+  @@index([status])
+  @@index([revokedAt])
+  @@index([deletedAt])
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  slug        String   @unique
+  name        String
+  title       String
+  description String?
+  status      String   @default("active")
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  users       AdminUserRole[]
+  permissions RolePermission[]
+
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model Permission {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  slug        String   @unique
+  name        String
+  title       String
+  description String?
+  status      String   @default("active")
+  resource    String
+  action      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  roles       RolePermission[]
+
+  @@unique([resource, action])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model AdminUserRole {
+  adminUserId Int
+  roleId      Int
+  assignedAt  DateTime @default(now())
+
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  role        Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([adminUserId, roleId])
+  @@index([roleId])
+}
+
+model RolePermission {
+  roleId       Int
+  permissionId Int
+  assignedAt   DateTime @default(now())
+
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+}
+
+model AuditLog {
+  id           Int       @id @default(autoincrement())
+  uuid         String    @unique @default(uuid())
+  actorId      Int?
+  action       String
+  resourceType String
+  resourceId   String?
+  description  String
+  metadata     Json?
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  actor        AdminUser? @relation("AuditLogActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([action])
+  @@index([resourceType])
+  @@index([createdAt])
+}
+
+// ==========================================================
+// Content and Experience Domain
+// ==========================================================
+
+model ExperienceCategory {
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  slug        String   @unique
+  name        String
+  title       String
+  description String?
+  status      String   @default("active")
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  experiences Experience[]
+
+  @@index([status])
+  @@index([sortOrder])
+  @@index([deletedAt])
+}
+
+model Experience {
+  id                  Int           @id @default(autoincrement())
+  uuid                String        @unique @default(uuid())
+  slug                String        @unique
+  name                String
+  title               String
+  shortDescription    String?
+  fullDescription     String?
+  description         String?
+  coverImageUrl       String?
+  galleryImageUrls    String[]      @default([])
+  status              String        @default("active")
+  publishStatus       PublishStatus @default(DRAFT)
+  visibility          Visibility    @default(PUBLIC)
+  categoryId          Int?
+  category            String?
+  difficulty          LessonLevel   @default(ALL_LEVELS)
+  recommendedAge      String?
+  duration            String?
+  maxParticipants     Int?
+  defaultLocaleCode   String?       @default("en")
+  durationMinutes     Int?
+  basePrice           Decimal?      @db.Decimal(10, 2)
+  discountPrice       Decimal?      @db.Decimal(10, 2)
+  instructor          String?
+  isFeatured          Boolean       @default(false)
+  displayOrder        Int           @default(0)
+  linkedLessonsCount  Int           @default(0)
+  seoTitle            String?
+  seoDescription      String?
+  capacityMin         Int?
+  capacityMax         Int?
+  metadata            Json?
+  createdById         Int?
+  updatedById         Int?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  deletedAt           DateTime?
+
+  categoryRef         ExperienceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  lessons             Lesson[]
+  coaches             CoachExperience[]
+  bookings            Booking[]
+  beaches             ExperienceBeach[]
+  createdBy           AdminUser?         @relation("ExperienceCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy           AdminUser?         @relation("ExperienceUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  seoPages            SEOPage[]
+
+  @@index([status])
+  @@index([publishStatus])
+  @@index([visibility])
+  @@index([difficulty])
+  @@index([isFeatured])
+  @@index([displayOrder])
+  @@index([categoryId])
+  @@index([deletedAt])
+}
+
+model Lesson {
+  id                  Int           @id @default(autoincrement())
+  uuid                String        @unique @default(uuid())
+  slug                String        @unique
+  name                String
+  title               String
+  description         String?
+  shortDescription    String?
+  fullDescription     String?
+  coverImageUrl       String?
+  status              String        @default("active")
+  publishStatus       PublishStatus @default(DRAFT)
+  visibility          Visibility    @default(PUBLIC)
+  level               LessonLevel   @default(BEGINNER)
+  difficulty          LessonLevel   @default(BEGINNER)
+  experienceId        Int?
+  beachId             Int?
+  defaultLocaleCode   String?       @default("en")
+  duration            String?
+  durationMinutes     Int?
+  price               Decimal?      @db.Decimal(10, 2)
+  maxParticipants     Int?
+  instructor          String?
+  isFeatured          Boolean       @default(false)
+  displayOrder        Int           @default(0)
+  seoTitle            String?
+  seoDescription      String?
+  metadata            Json?
+  createdById         Int?
+  updatedById         Int?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  deletedAt           DateTime?
+
+  experience          Experience?   @relation(fields: [experienceId], references: [id], onDelete: Restrict)
+  beach               Beach?        @relation(fields: [beachId], references: [id], onDelete: SetNull)
+  coaches             LessonCoach[]
+  bookings            Booking[]
+  createdBy           AdminUser?    @relation("LessonCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy           AdminUser?    @relation("LessonUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  seoPages            SEOPage[]
+
+  @@index([status])
+  @@index([publishStatus])
+  @@index([visibility])
+  @@index([level])
+  @@index([difficulty])
+  @@index([isFeatured])
+  @@index([displayOrder])
+  @@index([experienceId])
+  @@index([beachId])
+  @@index([deletedAt])
+}
+
+model Coach {
+  id                  Int           @id @default(autoincrement())
+  uuid                String        @unique @default(uuid())
+  slug                String        @unique
+  name                String
+  title               String
+  profilePhotoUrl     String?
+  coverPhotoUrl       String?
+  shortBio            String?
+  fullBio             String?
+  description         String?
+  websiteUrl          String?
+  status              String        @default("active")
+  publishStatus       PublishStatus @default(DRAFT)
+  visibility          Visibility    @default(PUBLIC)
+  isFeatured          Boolean       @default(false)
+  displayOrder        Int           @default(0)
+  specialization      String[]      @default([])
+  languages           String[]      @default([])
+  email               String?       @unique
+  phone               String?
+  instagramUrl        String?
+  facebookUrl         String?
+  linkedinUrl         String?
+  yearsExperience     Int?
+  certifications      String[]      @default([])
+  seoTitle            String?
+  seoDescription      String?
+  metadata            Json?
+  createdById         Int?
+  updatedById         Int?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  deletedAt           DateTime?
+
+  lessons             LessonCoach[]
+  experiences         CoachExperience[]
+  events              CoachEvent[]
+  beaches             CoachBeach[]
+  testimonials        Testimonial[]
+  createdBy           AdminUser?    @relation("CoachCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy           AdminUser?    @relation("CoachUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([publishStatus])
+  @@index([isFeatured])
+  @@index([displayOrder])
+  @@index([websiteUrl])
+  @@index([deletedAt])
+}
+
+model LessonCoach {
+  lessonId    Int
+  coachId     Int
+  isPrimary   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  coach       Coach    @relation(fields: [coachId], references: [id], onDelete: Cascade)
+
+  @@id([lessonId, coachId])
+  @@index([coachId])
+}
+
+model ExperienceBeach {
+  experienceId Int
+  beachId      Int
+  createdAt    DateTime @default(now())
+
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  beach        Beach      @relation(fields: [beachId], references: [id], onDelete: Cascade)
+
+  @@id([experienceId, beachId])
+  @@index([beachId])
+}
+
+model CoachBeach {
+  coachId      Int
+  beachId      Int
+  createdAt    DateTime @default(now())
+
+  coach        Coach @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  beach        Beach @relation(fields: [beachId], references: [id], onDelete: Cascade)
+
+  @@id([coachId, beachId])
+  @@index([beachId])
+}
+
+model CoachExperience {
+  coachId      Int
+  experienceId Int
+  isPrimary    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  coach        Coach      @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+
+  @@id([coachId, experienceId])
+  @@index([experienceId])
+}
+
+model CoachEvent {
+  coachId      Int
+  eventId      Int
+  isPrimary    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  coach        Coach @relation(fields: [coachId], references: [id], onDelete: Cascade)
+  event        Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@id([coachId, eventId])
+  @@index([eventId])
+}
+
+model Event {
+  id                    Int             @id @default(autoincrement())
+  uuid                  String          @unique @default(uuid())
+  slug                  String          @unique
+  name                  String
+  title                 String
+  shortDescription      String?
+  fullDescription       String?
+  description           String?
+  coverImageUrl         String?
+  galleryImageUrls      String[]        @default([])
+  category              String?
+  difficulty            EventDifficulty @default(ALL_LEVELS)
+  eventType             EventType       @default(WORKSHOP)
+  locationName          String?
+  googleMapsUrl         String?
+  status                String          @default("active")
+  eventStatus           EventStatus     @default(DRAFT)
+  publishStatus         PublishStatus   @default(DRAFT)
+  visibility            Visibility      @default(PUBLIC)
+  isFeatured            Boolean         @default(false)
+  beachId               Int?
+  locationId            Int?
+  defaultLocaleCode     String?         @default("en")
+  eventStartsAt         DateTime
+  eventEndsAt           DateTime?
+  registrationOpensAt   DateTime?
+  registrationClosesAt  DateTime?
+  startTimeLabel        String?
+  endTimeLabel          String?
+  capacityMin           Int?
+  capacityMax           Int?
+  currentParticipants   Int             @default(0)
+  instructorName        String?
+  basePrice             Decimal?        @db.Decimal(10, 2)
+  discountPrice         Decimal?        @db.Decimal(10, 2)
+  currencyCode          CurrencyCode    @default(INR)
+  seoTitle              String?
+  seoDescription        String?
+  metaKeywords          String[]        @default([])
+  metadata              Json?
+  createdById           Int?
+  updatedById           Int?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  deletedAt             DateTime?
+
+  beach               Beach?       @relation(fields: [beachId], references: [id], onDelete: SetNull)
+  location            Location?    @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  coaches             CoachEvent[]
+  bookings            Booking[]
+  createdBy           AdminUser?   @relation("EventCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy           AdminUser?   @relation("EventUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  seoPages            SEOPage[]
+
+  @@index([status])
+  @@index([eventStatus])
+  @@index([publishStatus])
+  @@index([isFeatured])
+  @@index([category])
+  @@index([instructorName])
+  @@index([eventStartsAt])
+  @@index([registrationClosesAt])
+  @@index([beachId])
+  @@index([locationId])
+  @@index([deletedAt])
+}
+
+model Booking {
+  id                  Int           @id @default(autoincrement())
+  uuid                String        @unique @default(uuid())
+  slug                String?       @unique
+  name                String
+  title               String?
+  description         String?
+  status              String        @default("active")
+  bookingStatus       BookingStatus @default(PENDING)
+  bookingType         BookingType
+  paymentStatus       PaymentStatus @default(UNPAID)
+  source              BookingSource @default(WEBSITE)
+  fullName            String
+  email               String
+  phone               String?
+  emergencyContact    String?
+  notes               String?
+  internalNotes       String?
+  assignedInstructor  String?
+  participantCount    Int           @default(1)
+  bookingDate         DateTime
+  preferredTime       String?
+  lessonId            Int?
+  experienceId        Int?
+  eventId             Int?
+  beachId             Int?
+  locationId          Int?
+  localeCode          String?       @default("en")
+  paymentReference    String?
+  couponCodeSnapshot  String?
+  metadata            Json?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  deletedAt           DateTime?
+
+  lesson              Lesson?       @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  experience          Experience?   @relation(fields: [experienceId], references: [id], onDelete: SetNull)
+  event               Event?        @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  beach               Beach?        @relation(fields: [beachId], references: [id], onDelete: SetNull)
+  location            Location?     @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  activityLogs        BookingActivity[]
+  testimonials        Testimonial[]
+
+  @@index([status])
+  @@index([bookingStatus])
+  @@index([bookingType])
+  @@index([paymentStatus])
+  @@index([email])
+  @@index([assignedInstructor])
+  @@index([bookingDate])
+  @@index([eventId])
+  @@index([lessonId])
+  @@index([experienceId])
+  @@index([deletedAt])
+}
+
+model BookingActivity {
+  id             Int                   @id @default(autoincrement())
+  uuid           String                @unique @default(uuid())
+  bookingId      Int
+  action         BookingActivityAction
+  oldStatus      BookingStatus?
+  newStatus      BookingStatus?
+  note           String?
+  metadata       Json?
+  adminUserId    Int?
+  createdAt      DateTime              @default(now())
+
+  booking        Booking               @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  adminUser      AdminUser?            @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
+
+  @@index([bookingId])
+  @@index([action])
+  @@index([createdAt])
+  @@index([adminUserId])
+}
+
+// ==========================================================
+// Media and Gallery
+// ==========================================================
+
+model Media {
+  id                  Int           @id @default(autoincrement())
+  uuid                String        @unique @default(uuid())
+  slug                String        @unique
+  name                String
+  title               String
+  description         String?
+  status              String        @default("active")
+  publishStatus       PublishStatus @default(DRAFT)
+  visibility          Visibility    @default(PUBLIC)
+  mediaType           MediaType
+  mimeType            String?
+  fileName            String
+  filePath            String
+  thumbnailPath       String?
+  cloudinaryPublicId  String?
+  cloudinaryThumbId   String?
+  folderPath          String        @default("library/general")
+  tags                String[]      @default([])
+  caption             String?
+  usageCount          Int           @default(0)
+  fileSizeBytes       Int?
+  width               Int?
+  height              Int?
+  durationSeconds     Int?
+  altText             String?
+  localeCode          String?       @default("en")
+  beachId             Int?
+  metadata            Json?
+  createdById         Int?
+  updatedById         Int?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  deletedAt           DateTime?
+
+  beach               Beach?        @relation(fields: [beachId], references: [id], onDelete: SetNull)
+  galleryImages       GalleryImage[]
+  createdBy           AdminUser?    @relation("MediaCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy           AdminUser?    @relation("MediaUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([publishStatus])
+  @@index([visibility])
+  @@index([mediaType])
+  @@index([folderPath])
+  @@index([createdById])
+  @@index([usageCount])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+model GalleryCategory {
+  id                  Int           @id @default(autoincrement())
+  uuid                String        @unique @default(uuid())
+  slug                String        @unique
+  name                String
+  title               String
+  shortDescription    String?
+  description         String?
+  coverImageUrl       String?
+  status              String        @default("active")
+  publishStatus       PublishStatus @default(DRAFT)
+  visibility          Visibility    @default(PUBLIC)
+  isFeatured          Boolean       @default(false)
+  sortOrder           Int           @default(0)
+  seoTitle            String?
+  seoDescription      String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  deletedAt           DateTime?
+
+  images              GalleryImage[]
+
+  @@index([status])
+  @@index([publishStatus])
+  @@index([isFeatured])
+  @@index([sortOrder])
+  @@index([deletedAt])
+}
+
+model GalleryImage {
+  id                  Int           @id @default(autoincrement())
+  uuid                String        @unique @default(uuid())
+  slug                String        @unique
+  name                String
+  title               String
+  altText             String?
+  caption             String?
+  description         String?
+  photographer        String?
+  tags                String[]      @default([])
+  status              String        @default("active")
+  publishStatus       PublishStatus @default(DRAFT)
+  visibility          Visibility    @default(PUBLIC)
+  isFeatured          Boolean       @default(false)
+  categoryId          Int?
+  mediaId             Int
+  localeCode          String?       @default("en")
+  sortOrder           Int           @default(0)
+  capturedAt          DateTime?
+  createdById         Int?
+  updatedById         Int?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  deletedAt           DateTime?
+
+  category            GalleryCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  media               Media            @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+  locale              Locale?          @relation(fields: [localeCode], references: [code], onDelete: SetNull)
+  createdBy           AdminUser?       @relation("GalleryImageCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy           AdminUser?       @relation("GalleryImageUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([publishStatus])
+  @@index([isFeatured])
+  @@index([categoryId])
+  @@index([sortOrder])
+  @@index([capturedAt])
+  @@index([deletedAt])
+}
+
+// ==========================================================
+// Website Messaging and Content Blocks
+// ==========================================================
+
+model ContactMessage {
+  id                  Int                  @id @default(autoincrement())
+  uuid                String               @unique @default(uuid())
+  slug                String?              @unique
+  name                String
+  title               String?
+  description         String?
+  status              ContactMessageStatus @default(NEW)
+  fullName            String
+  email               String
+  phone               String?
+  subject             String?
+  message             String               @db.Text
+  source              String               @default("website")
+  metadata            Json?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  deletedAt           DateTime?
+
+  @@index([status])
+  @@index([email])
+  @@index([createdAt])
+  @@index([deletedAt])
+}
+
+model FAQ {
+  id                  Int           @id @default(autoincrement())
+  uuid                String        @unique @default(uuid())
+  slug                String        @unique
+  name                String
+  title               String
+  description         String?
+  status              String        @default("active")
+  publishStatus       PublishStatus @default(DRAFT)
+  visibility          Visibility    @default(PUBLIC)
+  isFeatured          Boolean       @default(false)
+  question            String
+  answer              String        @db.Text
+  localeCode          String?       @default("en")
+  sortOrder           Int           @default(0)
+  createdById         Int?
+  updatedById         Int?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  deletedAt           DateTime?
+
+  locale              Locale?       @relation(fields: [localeCode], references: [code], onDelete: SetNull)
+  createdBy           AdminUser?    @relation("FAQCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy           AdminUser?    @relation("FAQUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([publishStatus])
+  @@index([sortOrder])
+  @@index([deletedAt])
+}
+
+model Testimonial {
+  id                  Int           @id @default(autoincrement())
+  uuid                String        @unique @default(uuid())
+  slug                String        @unique
+  name                String
+  title               String
+  description         String?
+  status              String        @default("active")
+  publishStatus       PublishStatus @default(DRAFT)
+  visibility          Visibility    @default(PUBLIC)
+  isFeatured          Boolean       @default(false)
+  authorName          String
+  authorEmail         String?
+  authorLocation      String?
+  rating              Int?
+  quote               String        @db.Text
+  localeCode          String?       @default("en")
+  coachId             Int?
+  bookingId           Int?
+  createdById         Int?
+  updatedById         Int?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  deletedAt           DateTime?
+
+  locale              Locale?       @relation(fields: [localeCode], references: [code], onDelete: SetNull)
+  coach               Coach?        @relation(fields: [coachId], references: [id], onDelete: SetNull)
+  booking             Booking?      @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  createdBy           AdminUser?    @relation("TestimonialCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy           AdminUser?    @relation("TestimonialUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([publishStatus])
+  @@index([rating])
+  @@index([coachId])
+  @@index([deletedAt])
+}
+
+// ==========================================================
+// SEO and Site Configuration
+// ==========================================================
+
+model SEOPage {
+  id                  Int           @id @default(autoincrement())
+  uuid                String        @unique @default(uuid())
+  slug                String        @unique
+  name                String
+  title               String
+  description         String?
+  status              String        @default("active")
+  publishStatus       PublishStatus @default(DRAFT)
+  visibility          Visibility    @default(PUBLIC)
+  routePath           String
+  canonicalUrl        String?
+  metaTitle           String
+  metaDescription     String?
+  metaKeywords        String[]
+  robots              String?
+  openGraphTitle      String?
+  openGraphDescription String?
+  openGraphImage      String?
+  schemaJson          Json?
+  localeCode          String?       @default("en")
+  lessonId            Int?
+  experienceId        Int?
+  eventId             Int?
+  createdById         Int?
+  updatedById         Int?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  deletedAt           DateTime?
+
+  locale              Locale?       @relation(fields: [localeCode], references: [code], onDelete: SetNull)
+  lesson              Lesson?       @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  experience          Experience?   @relation(fields: [experienceId], references: [id], onDelete: SetNull)
+  event               Event?        @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  createdBy           AdminUser?    @relation("SEOPageCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy           AdminUser?    @relation("SEOPageUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@unique([routePath, localeCode])
+  @@index([status])
+  @@index([publishStatus])
+  @@index([deletedAt])
+}
+
+model SiteSetting {
+  id                  Int             @id @default(autoincrement())
+  uuid                String          @unique @default(uuid())
+  slug                String          @unique
+  name                String
+  title               String
+  description         String?
+  status              String          @default("active")
+  settingKey          String          @unique
+  settingType         SiteSettingType @default(STRING)
+  valueString         String?
+  valueNumber         Decimal?        @db.Decimal(14, 4)
+  valueBoolean        Boolean?
+  valueJson           Json?
+  isPublic            Boolean         @default(false)
+  createdById         Int?
+  updatedById         Int?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  deletedAt           DateTime?
+
+  createdBy           AdminUser?      @relation("SiteSettingCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy           AdminUser?      @relation("SiteSettingUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([isPublic])
+  @@index([deletedAt])
+}
+
+model Navigation {
+  id                  Int            @id @default(autoincrement())
+  uuid                String         @unique @default(uuid())
+  slug                String         @unique
+  name                String
+  title               String
+  description         String?
+  status              String         @default("active")
+  publishStatus       PublishStatus  @default(DRAFT)
+  visibility          Visibility     @default(PUBLIC)
+  navigationType      NavigationType @default(HEADER)
+  label               String
+  href                String
+  icon                String?
+  parentId            Int?
+  localeCode          String?        @default("en")
+  sortOrder           Int            @default(0)
+  createdById         Int?
+  updatedById         Int?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  deletedAt           DateTime?
+
+  parent              Navigation?    @relation("NavigationTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children            Navigation[]   @relation("NavigationTree")
+  locale              Locale?        @relation(fields: [localeCode], references: [code], onDelete: SetNull)
+  createdBy           AdminUser?     @relation("NavigationCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy           AdminUser?     @relation("NavigationUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([publishStatus])
+  @@index([navigationType])
+  @@index([parentId])
+  @@index([sortOrder])
+  @@index([deletedAt])
+}
+
+model FooterLink {
+  id                  Int           @id @default(autoincrement())
+  uuid                String        @unique @default(uuid())
+  slug                String        @unique
+  name                String
+  title               String
+  description         String?
+  status              String        @default("active")
+  publishStatus       PublishStatus @default(DRAFT)
+  visibility          Visibility    @default(PUBLIC)
+  section             String
+  label               String
+  href                String
+  icon                String?
+  localeCode          String?       @default("en")
+  sortOrder           Int           @default(0)
+  createdById         Int?
+  updatedById         Int?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  deletedAt           DateTime?
+
+  locale              Locale?       @relation(fields: [localeCode], references: [code], onDelete: SetNull)
+  createdBy           AdminUser?    @relation("FooterLinkCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy           AdminUser?    @relation("FooterLinkUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([publishStatus])
+  @@index([section])
+  @@index([sortOrder])
+  @@index([deletedAt])
+}
