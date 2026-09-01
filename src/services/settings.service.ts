@@ -42,7 +42,7 @@ function mergeSettings(raw: unknown): WebsiteSettings {
     galleryPage: { ...DEFAULT_WEBSITE_SETTINGS.galleryPage, ...(partial.galleryPage ?? {}), hero: { ...DEFAULT_WEBSITE_SETTINGS.galleryPage.hero, ...(partial.galleryPage?.hero ?? {}) } },
     general: { ...DEFAULT_WEBSITE_SETTINGS.general, ...(partial.general ?? {}) },
     homepage: { ...DEFAULT_WEBSITE_SETTINGS.homepage, ...(partial.homepage ?? {}) },
-    contact: { ...DEFAULT_WEBSITE_SETTINGS.contact, ...(partial.contact ?? {}) },
+    contact: { ...DEFAULT_WEBSITE_SETTINGS.contact, ...(partial.contact ?? {}), hero: { ...DEFAULT_WEBSITE_SETTINGS.contact.hero, ...(partial.contact?.hero ?? {}) } },
     socialMedia: { ...DEFAULT_WEBSITE_SETTINGS.socialMedia, ...(partial.socialMedia ?? {}) },
     navigation: { ...DEFAULT_WEBSITE_SETTINGS.navigation, ...(partial.navigation ?? {}) },
     footer: { ...DEFAULT_WEBSITE_SETTINGS.footer, ...(partial.footer ?? {}) },

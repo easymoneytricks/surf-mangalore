@@ -56,7 +56,11 @@ export const websiteSettingsBodySchema = z.object({
     homepageFeaturedSectionToggle: z.boolean(),
   }),
   contact: z.object({
+    hero: z.record(z.string(), z.unknown()).optional(),
     businessAddress: z.string().trim().min(1).max(260),
+    nearestLandmark: z.string().trim().max(300).optional(),
+    parking: z.string().trim().max(300).optional(),
+    travelTips: z.string().trim().max(500).optional(),
     googleMapsUrl: optionalHttpUrl,
     supportEmail: z.string().trim().email().max(180),
     supportPhone: z.string().trim().max(40),

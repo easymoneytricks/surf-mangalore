@@ -27,6 +27,8 @@
 - Fixed settings save-state mismatch that dropped the new page groups from the backend response and crashed the active admin tab after saving.
 - Added settings-driven Gallery Page hero content and image fallback without changing gallery item/media behavior or public layout.
 - Added public `/privacy` and `/terms` legal pages with booking-specific wording, SEO metadata, and footer navigation while preserving the existing visual system.
+- Fixed homepage Upcoming Experiences data source and imagery, and normalized About Community and Featured Event image rendering with safe fallbacks.
+- Completed Contact Page settings integration, including configurable hero content/image, location details, and safe Google Maps embed rendering.
 
 ## 2026-09-01 - Booking Availability Shape Fix
 

@@ -11,6 +11,7 @@ export type ExperiencePublicModel = {
   cta: string
   imageLabel: string
   imageClassName: string
+  imageUrl: string
   bestFor: string
   support: string
   outcome: string
@@ -114,6 +115,7 @@ function toExperienceCard(item: ExperienceListResponse['data']['items'][number])
     cta: 'Book this experience',
     imageLabel: item.category || 'Surf Experience',
     imageClassName: `bg-[linear-gradient(135deg,rgba(122,214,209,0.18),rgba(255,143,74,0.12)),${coverImage}] bg-cover bg-center`,
+    imageUrl: item.coverImageUrl || '/images/placeholders/ocean.svg',
     bestFor: item.recommendedAge || 'Guests looking for guided surf progression',
     support: item.instructor ? `Led by ${item.instructor}` : 'Guided by certified instructors',
     outcome: item.fullDescription || shortDescription,

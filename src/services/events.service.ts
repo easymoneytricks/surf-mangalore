@@ -11,6 +11,7 @@ export type EventPublicItem = {
   category: string
   description: string
   image: string
+  imageUrl: string
   participants: string
   status: 'upcoming' | 'past'
   tag: string
@@ -155,6 +156,7 @@ function toEventPublicItem(item: EventListResponse['data']['items'][number]): Ev
     category,
     description,
     image: buildEventImage(item.coverImageUrl),
+    imageUrl: item.coverImageUrl || '/images/placeholders/events.svg',
     participants: item.capacityMax ? `Up to ${item.capacityMax} guests` : 'Flexible group size',
     status: resolveEventStatus(item.startDate),
     tag: item.eventType || category,

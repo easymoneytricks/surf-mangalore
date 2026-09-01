@@ -19,7 +19,7 @@ function mergeSettings(raw: unknown): WebsiteSettings {
     galleryPage: { ...DEFAULT_WEBSITE_SETTINGS.galleryPage, ...(next.galleryPage ?? {}) },
     general: { ...DEFAULT_WEBSITE_SETTINGS.general, ...(next.general ?? {}) },
     homepage: { ...DEFAULT_WEBSITE_SETTINGS.homepage, ...(next.homepage ?? {}) },
-    contact: { ...DEFAULT_WEBSITE_SETTINGS.contact, ...(next.contact ?? {}) },
+    contact: { ...DEFAULT_WEBSITE_SETTINGS.contact, ...(next.contact ?? {}), hero: { ...DEFAULT_WEBSITE_SETTINGS.contact.hero, ...(next.contact?.hero ?? {}) } },
     socialMedia: { ...DEFAULT_WEBSITE_SETTINGS.socialMedia, ...(next.socialMedia ?? {}) },
     navigation: { ...DEFAULT_WEBSITE_SETTINGS.navigation, ...(next.navigation ?? {}) },
     footer: { ...DEFAULT_WEBSITE_SETTINGS.footer, ...(next.footer ?? {}) },

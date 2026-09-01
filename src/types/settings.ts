@@ -73,7 +73,11 @@ export type WebsiteSettings = {
     homepageFeaturedSectionToggle: boolean
   }
   contact: {
+    hero: { eyebrow: string; title: string; description: string; primaryCtaLabel: string; primaryCtaPath: string; secondaryCtaLabel: string; secondaryCtaPath: string; imageUrl: string; supportLabel: string; supportText: string }
     businessAddress: string
+    nearestLandmark: string
+    parking: string
+    travelTips: string
     googleMapsUrl?: string
     supportEmail: string
     supportPhone: string

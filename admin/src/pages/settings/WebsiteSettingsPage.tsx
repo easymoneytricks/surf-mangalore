@@ -53,7 +53,7 @@ export default function WebsiteSettingsPage() {
         setError(null)
         const data = await settingsService.get()
         const safeData = data && typeof data === 'object' ? data : DEFAULT_WEBSITE_SETTINGS
-        setSettings({ ...DEFAULT_WEBSITE_SETTINGS, ...safeData, about: normalizeAbout(safeData.about), experiencePage: normalizeExperiencePage(safeData.experiencePage), lessonPage: normalizeLessonPage(safeData.lessonPage), eventPage: normalizeEventPage(safeData.eventPage), galleryPage: normalizeGalleryPage(safeData.galleryPage) })
+        setSettings({ ...DEFAULT_WEBSITE_SETTINGS, ...safeData, about: normalizeAbout(safeData.about), experiencePage: normalizeExperiencePage(safeData.experiencePage), lessonPage: normalizeLessonPage(safeData.lessonPage), eventPage: normalizeEventPage(safeData.eventPage), galleryPage: normalizeGalleryPage(safeData.galleryPage), contact: normalizeContact(safeData.contact) })
       } catch (loadError) {
         const message = loadError instanceof Error ? loadError.message : 'Failed to load settings'
         setError(message)
@@ -127,7 +127,7 @@ export default function WebsiteSettingsPage() {
       setSuccess(null)
       const saved = await settingsService.update(settings)
       const safeSaved = saved && typeof saved === 'object' ? saved : settings
-      setSettings({ ...DEFAULT_WEBSITE_SETTINGS, ...safeSaved, about: normalizeAbout(safeSaved.about), experiencePage: normalizeExperiencePage(safeSaved.experiencePage), lessonPage: normalizeLessonPage(safeSaved.lessonPage), eventPage: normalizeEventPage(safeSaved.eventPage), galleryPage: normalizeGalleryPage(safeSaved.galleryPage) })
+      setSettings({ ...DEFAULT_WEBSITE_SETTINGS, ...safeSaved, about: normalizeAbout(safeSaved.about), experiencePage: normalizeExperiencePage(safeSaved.experiencePage), lessonPage: normalizeLessonPage(safeSaved.lessonPage), eventPage: normalizeEventPage(safeSaved.eventPage), galleryPage: normalizeGalleryPage(safeSaved.galleryPage), contact: normalizeContact(safeSaved.contact) })
       setSuccess('Website settings saved successfully.')
     } catch (saveError) {
       const message = saveError instanceof Error ? saveError.message : 'Failed to save settings'
@@ -213,8 +213,23 @@ export default function WebsiteSettingsPage() {
 
       {tab === 'contact' && (
         <section className="grid gap-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-6 md:grid-cols-2">
+          <div className="md:col-span-2"><h2 className="text-lg font-semibold text-white">Contact Hero</h2></div>
+          <Field label="Hero Eyebrow" value={settings.contact.hero.eyebrow} onChange={(v) => update('contact', { ...settings.contact, hero: { ...settings.contact.hero, eyebrow: v } })} />
+          <Field label="Hero Title" value={settings.contact.hero.title} onChange={(v) => update('contact', { ...settings.contact, hero: { ...settings.contact.hero, title: v } })} />
+          <Field label="Hero Description" value={settings.contact.hero.description} onChange={(v) => update('contact', { ...settings.contact, hero: { ...settings.contact.hero, description: v } })} />
+          <Field label="Primary CTA Label" value={settings.contact.hero.primaryCtaLabel} onChange={(v) => update('contact', { ...settings.contact, hero: { ...settings.contact.hero, primaryCtaLabel: v } })} />
+          <Field label="Primary CTA Path" value={settings.contact.hero.primaryCtaPath} onChange={(v) => update('contact', { ...settings.contact, hero: { ...settings.contact.hero, primaryCtaPath: v } })} />
+          <Field label="Secondary CTA Label" value={settings.contact.hero.secondaryCtaLabel} onChange={(v) => update('contact', { ...settings.contact, hero: { ...settings.contact.hero, secondaryCtaLabel: v } })} />
+          <Field label="Secondary CTA Path" value={settings.contact.hero.secondaryCtaPath} onChange={(v) => update('contact', { ...settings.contact, hero: { ...settings.contact.hero, secondaryCtaPath: v } })} />
+          <Field label="Hero Image URL" value={settings.contact.hero.imageUrl} onChange={(v) => update('contact', { ...settings.contact, hero: { ...settings.contact.hero, imageUrl: v } })} />
+          <Field label="Support Card Label" value={settings.contact.hero.supportLabel} onChange={(v) => update('contact', { ...settings.contact, hero: { ...settings.contact.hero, supportLabel: v } })} />
+          <Field label="Support Card Text" value={settings.contact.hero.supportText} onChange={(v) => update('contact', { ...settings.contact, hero: { ...settings.contact.hero, supportText: v } })} />
+          <div className="md:col-span-2"><h2 className="mt-3 text-lg font-semibold text-white">Location</h2></div>
           <Field label="Business Address" value={settings.contact.businessAddress} onChange={(value) => update('contact', { ...settings.contact, businessAddress: value })} />
-          <Field label="Google Maps URL" value={settings.contact.googleMapsUrl || ''} onChange={(value) => update('contact', { ...settings.contact, googleMapsUrl: value })} />
+          <Field label="Nearest Landmark" value={settings.contact.nearestLandmark} onChange={(v) => update('contact', { ...settings.contact, nearestLandmark: v })} />
+          <Field label="Parking" value={settings.contact.parking} onChange={(v) => update('contact', { ...settings.contact, parking: v })} />
+          <Field label="Travel Tips" value={settings.contact.travelTips} onChange={(v) => update('contact', { ...settings.contact, travelTips: v })} />
+          <label className="text-sm text-neutral-300">Google Maps Embed URL<input className="mt-2 w-full rounded-xl border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-white" value={settings.contact.googleMapsUrl || ''} onChange={(event) => update('contact', { ...settings.contact, googleMapsUrl: event.target.value })} /><span className="mt-2 block text-xs text-neutral-400">Paste the Google Maps embed URL from Share → Embed a map, or a complete iframe snippet.</span></label>
           <Field label="Support Email" value={settings.contact.supportEmail} onChange={(value) => update('contact', { ...settings.contact, supportEmail: value })} />
           <Field label="Support Phone" value={settings.contact.supportPhone} onChange={(value) => update('contact', { ...settings.contact, supportPhone: value })} />
           <Field label="Emergency Contact" value={settings.contact.emergencyContact} onChange={(value) => update('contact', { ...settings.contact, emergencyContact: value })} />
@@ -433,3 +448,4 @@ function normalizeExperiencePage(value: Partial<ExperiencePageSettings> | null |
 function normalizeLessonPage(value: Partial<LessonPageSettings> | null | undefined): LessonPageSettings { const raw = value || {}; return { ...defaultLessonPage, ...raw, hero: { ...defaultLessonPage.hero, ...(raw.hero || {}) } } }
 function normalizeEventPage(value: Partial<EventPageSettings> | null | undefined): EventPageSettings { const raw = value || {}; return { ...defaultEventPage, ...raw, hero: { ...defaultEventPage.hero, ...(raw.hero || {}) }, heroStats: Array.isArray(raw.heroStats) ? raw.heroStats : defaultEventPage.heroStats, featured: { ...defaultEventPage.featured, ...(raw.featured || {}) }, pastMemories: { ...defaultEventPage.pastMemories, ...(raw.pastMemories || {}), items: Array.isArray(raw.pastMemories?.items) ? raw.pastMemories.items : defaultEventPage.pastMemories.items } } }
 function normalizeGalleryPage(value: Partial<GalleryPageSettings> | null | undefined): GalleryPageSettings { const raw = value || {}; return { ...defaultGalleryPage, ...raw, hero: { ...defaultGalleryPage.hero, ...(raw.hero || {}) } } }
+function normalizeContact(value: Partial<WebsiteSettings['contact']> | null | undefined): WebsiteSettings['contact'] { const raw = value || {}; return { ...DEFAULT_WEBSITE_SETTINGS.contact, ...raw, hero: { ...DEFAULT_WEBSITE_SETTINGS.contact.hero, ...(raw.hero || {}) }, businessHours: Array.isArray(raw.businessHours) ? raw.businessHours : DEFAULT_WEBSITE_SETTINGS.contact.businessHours } }

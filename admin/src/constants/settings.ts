@@ -30,7 +30,11 @@ export const DEFAULT_WEBSITE_SETTINGS: WebsiteSettings = {
     homepageFeaturedSectionToggle: true,
   },
   contact: {
+    hero: { eyebrow: 'Contact Surf Mangalore', title: 'Getting in touch should feel as easy as the first good wave.', description: 'Whether you want to plan your first lesson, a private coaching day, or a group surf experience, our team keeps the process warm, clear, and genuinely helpful.', primaryCtaLabel: 'Start booking', primaryCtaPath: '/booking', secondaryCtaLabel: 'Explore experiences', secondaryCtaPath: '/experiences', imageUrl: '', supportLabel: 'Easy planning support', supportText: 'Tell us what kind of surf day you want, and we will guide the best next step without making the process feel complicated.' },
     businessAddress: 'Malpe, Karnataka',
+    nearestLandmark: 'Main Malpe beachfront access and surf-friendly pickup zone.',
+    parking: 'Space for cars and bikes is typically available near the beach entry area.',
+    travelTips: 'Arrive a little early, carry water, and message us if you need help with local timing or transport guidance.',
     googleMapsUrl: '',
     supportEmail: 'hello@surfmangalore.com',
     supportPhone: '+91 98765 43210',

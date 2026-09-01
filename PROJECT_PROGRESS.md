@@ -474,3 +474,5 @@
 - Fixed the post-save Admin Settings crash: backend validation/merge now preserves Lesson Page and Event Page groups, and the admin normalizes the save response before replacing local form state.
 - Added a Gallery Page settings tab for the existing gallery hero copy, CTAs, visual labels, and image URL while leaving gallery items, media, grid, and lightbox unchanged.
 - Added native public Privacy Policy and Terms & Conditions pages at `/privacy` and `/terms`; footer legal labels now navigate to these routes and contact details are read from Site Settings.
+- Corrected homepage Upcoming Experiences to use published Experience records and their CMS cover images, with safe fallback imagery. About Community and Featured Event visuals now resolve configured/record images consistently without blank panels.
+- Completed Contact Page settings integration: hero copy/CTAs/image, location details, and Google Maps Embed URL are now settings-driven with safe fallbacks and iframe rendering for valid embed URLs.

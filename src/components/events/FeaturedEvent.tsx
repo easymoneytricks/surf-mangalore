@@ -5,6 +5,7 @@ import Card from '../Card'
 import type { EventPublicItem } from '../../services/events.service'
 import { navigateTo } from '../../utils/navigation'
 import { useWebsiteSettings } from '../../contexts/WebsiteSettingsContext'
+import { resolveImageUrl } from '../../utils/image'
 
 type FeaturedEventProps = {
   event: EventPublicItem
@@ -13,6 +14,7 @@ type FeaturedEventProps = {
 export default function FeaturedEvent({ event }: FeaturedEventProps) {
   const { settings } = useWebsiteSettings()
   const content = settings.eventPage.featured
+  const imageUrl = resolveImageUrl(event.imageUrl || event.image, '/images/placeholders/events.svg')
   const bookingQuery = new URLSearchParams({
     bookingType: 'EVENT',
     selectedItemId: event.id,
@@ -60,7 +62,7 @@ export default function FeaturedEvent({ event }: FeaturedEventProps) {
 
           <motion.div initial={{ opacity: 0, scale: 0.96 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.45 }}>
             <Card variant="image" className="overflow-hidden border-white/15 p-0">
-              <div className={`relative aspect-[4/5] bg-cover bg-center ${event.image}`}>
+              <div className="relative aspect-[4/5] bg-cover bg-center" style={{ backgroundImage: `linear-gradient(135deg,rgba(122,214,209,0.18),rgba(255,143,74,0.12)),url('${imageUrl}')` }}>
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,19,27,0.06),rgba(4,19,27,0.8))]" />
                 <div className="absolute left-5 top-5 rounded-full border border-white/12 bg-[rgba(4,19,27,0.46)] px-3 py-1 text-[0.68rem] uppercase tracking-[0.32em] text-white backdrop-blur-lg">
                   {event.category}
