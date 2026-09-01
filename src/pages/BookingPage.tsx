@@ -10,7 +10,7 @@ import BookingSummary from '../components/booking/BookingSummary'
 import BookingSuccess from '../components/booking/BookingSuccess'
 import Button from '../components/Button'
 import Card from '../components/Card'
-import { bookingParticipantConfig, bookingSteps, bookingTimeSlots } from '../data/bookingOptions'
+import { bookingParticipantConfig, bookingStepsForType } from '../data/bookingOptions'
 import { createBooking, fetchBookableOptions } from '../services/bookings.service'
 import type { BookingCreatePayload, BookingFieldError, BookingFormData, BookingSelectableItem, BookingStep, PublicBookingType } from '../types/booking'
 
@@ -64,13 +64,19 @@ export default function BookingPage() {
     location: string
     paymentNotice: string
     support: string
+    bookingType?: PublicBookingType
   } | null>(null)
   const [lastSubmissionSignature, setLastSubmissionSignature] = useState<string | null>(null)
   const [lastSubmittedAt, setLastSubmittedAt] = useState<number | null>(null)
   const stepHeadingRef = useRef<HTMLHeadingElement | null>(null)
 
-  const stepIndex = useMemo(() => bookingSteps.findIndex((step) => step.id === currentStep), [currentStep])
-  const stepConfig = bookingSteps[stepIndex]
+  const activeSteps = useMemo(() => bookingStepsForType(formData.bookingType), [formData.bookingType])
+  const stepIndex = useMemo(() => activeSteps.findIndex((step) => step.id === currentStep), [activeSteps, currentStep])
+  const stepConfig = activeSteps[stepIndex] || activeSteps[0]
+
+  useEffect(() => {
+    if (!activeSteps.some((step) => step.id === currentStep)) setCurrentStep(activeSteps[0]?.id || 'offering')
+  }, [activeSteps, currentStep])
 
   useEffect(() => {
     let cancelled = false
@@ -108,7 +114,7 @@ export default function BookingPage() {
       if (parsed.formData) {
         setFormData(parsed.formData)
       }
-      if (parsed.currentStep && bookingSteps.some((step) => step.id === parsed.currentStep)) {
+      if (parsed.currentStep && bookingStepsForType(parsed.formData?.bookingType || '').some((step) => step.id === parsed.currentStep)) {
         setCurrentStep(parsed.currentStep)
       }
     } catch {
@@ -247,14 +253,14 @@ export default function BookingPage() {
       return
     }
 
-    const nextStep = bookingSteps[stepIndex + 1]
+    const nextStep = activeSteps[stepIndex + 1]
     if (nextStep) {
       setCurrentStep(nextStep.id)
     }
   }
 
   const goPrevious = () => {
-    const previousStep = bookingSteps[stepIndex - 1]
+    const previousStep = activeSteps[stepIndex - 1]
     if (previousStep) {
       setCurrentStep(previousStep.id)
     }
@@ -272,7 +278,7 @@ export default function BookingPage() {
     const payload: BookingCreatePayload = {
       bookingType: formData.bookingType,
       selectedItemId: Number(formData.selectedItemId),
-      preferredDate: formData.preferredDate,
+      preferredDate: formData.preferredDate || undefined,
       preferredTime: formData.preferredTime || undefined,
       participants: formData.participants,
       customerName: formData.name.trim(),
@@ -306,6 +312,7 @@ export default function BookingPage() {
           location: result.location || 'Surf Mangalore venue details will be shared by support',
           paymentNotice: result.paymentNotice || 'Pay at venue on arrival.',
           support: import.meta.env.VITE_SUPPORT_WHATSAPP || import.meta.env.VITE_PUBLIC_PHONE || '+91 00000 00000',
+          bookingType: result.bookingType,
         })
         setIsSubmitted(true)
         setLastSubmissionSignature(signature)
@@ -344,7 +351,7 @@ export default function BookingPage() {
           <BookingSuccess guestName={formData.name} confirmation={confirmation} onCreateAnother={resetBooking} />
         ) : (
           <div className="space-y-6">
-            <BookingStepper steps={bookingSteps} currentStep={currentStep} />
+            <BookingStepper steps={activeSteps} currentStep={currentStep} />
 
             <Card variant="feature" className="border-white/12 p-6 sm:p-8">
               <div className="border-b border-white/10 pb-5">
@@ -372,17 +379,15 @@ export default function BookingPage() {
                   </>
                 ) : null}
 
-                {currentStep === 'date' ? <DatePicker value={formData.preferredDate} onChange={(value) => setField('preferredDate', value)} error={fieldErrors.preferredDate} /> : null}
+                {currentStep === 'date' ? <DatePicker value={formData.preferredDate} availableDates={formData.bookingType === 'EXPERIENCE' ? (selectedItem?.availability || []).map((date) => date.date) : undefined} onChange={(value) => { setField('preferredDate', value); setField('preferredTime', '') }} error={fieldErrors.preferredDate} /> : null}
 
-                {currentStep === 'time' ? <TimeSelector slots={bookingTimeSlots} value={formData.preferredTime} onChange={(value) => setField('preferredTime', value)} error={fieldErrors.preferredTime} /> : null}
+                {currentStep === 'time' ? <TimeSelector slots={(selectedItem?.availability?.find((date) => date.date === formData.preferredDate)?.slots || [])} value={formData.preferredTime} onChange={(value) => setField('preferredTime', value)} error={fieldErrors.preferredTime} /> : null}
 
                 {currentStep === 'participants' ? (
-                  <ParticipantSelector
-                    value={formData.participants}
-                    config={bookingParticipantConfig}
-                    onChange={(value) => setField('participants', value)}
-                    error={fieldErrors.participants}
-                  />
+                  <>
+                    {formData.bookingType === 'EVENT' && selectedItem?.eventStart ? <p className="mb-5 rounded-2xl border border-white/12 bg-white/6 px-4 py-3 text-sm text-(--color-text-secondary)">Fixed event schedule: {new Date(selectedItem.eventStart).toLocaleString()}{selectedItem.eventEnd ? ` – ${new Date(selectedItem.eventEnd).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : ''}</p> : null}
+                    <ParticipantSelector value={formData.participants} config={bookingParticipantConfig} onChange={(value) => setField('participants', value)} error={fieldErrors.participants} />
+                  </>
                 ) : null}
 
                 {currentStep === 'details' ? (

@@ -23,8 +23,8 @@ export default function BookingSummary({ formData, options }: BookingSummaryProp
 
         <Card variant="glass" className="border-white/12 p-5">
           <p className="text-[0.68rem] uppercase tracking-[0.26em] text-(--color-primary)">Schedule</p>
-          <p className="mt-2 text-base font-semibold text-white">{formData.preferredDate || 'No date selected'}</p>
-          <p className="mt-2 text-sm leading-7 text-(--color-text-secondary)">{formData.preferredTime || 'No time selected'}</p>
+          <p className="mt-2 text-base font-semibold text-white">{formData.bookingType === 'EVENT' ? selectedItem?.eventStart ? new Date(selectedItem.eventStart).toLocaleDateString() : 'Event schedule' : formData.preferredDate || 'No date selected'}</p>
+          <p className="mt-2 text-sm leading-7 text-(--color-text-secondary)">{formData.bookingType === 'EVENT' ? `${selectedItem?.eventStart ? new Date(selectedItem.eventStart).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : ''}${selectedItem?.eventEnd ? ` – ${new Date(selectedItem.eventEnd).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : ''}` : formData.preferredTime || 'No time selected'}</p>
         </Card>
 
         <Card variant="glass" className="border-white/12 p-5">

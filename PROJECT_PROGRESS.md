@@ -429,3 +429,18 @@
 - The contact-message status translation maps `READ` to the existing database value `IN_REVIEW` and `REPLIED` to `RESOLVED` to avoid a schema migration in this pass.
 - The gallery/media area was polished through the existing media and gallery stack; no storage-provider migration was introduced.
 - A full project-wide build/migration run still needs live PostgreSQL access in the target environment before final production verification.
+
+## Homepage Hero and Admin Copy Follow-up (2026-08-31)
+
+- Added the CMS-backed `homepage.heroDroneShotImageUrl` setting, retaining the existing Drone Shot asset as the default and public fallback.
+- Added the Hero Drone Shot Image URL field to Admin Settings > Homepage and validated it through the existing settings API payload.
+- Kept the hero composition intact while making the Golden-hour hero copy readable above the overlap.
+- Added the CMS-sourced homepage lesson CTA (`View lesson`) using the existing lesson slug route.
+- Updated admin copy from `Admin Workspace` to `Admin Panel` and the global-search placeholder to `Search`.
+
+## Booking Semantics Correction (2026-09-01)
+
+- Booking wizard now uses type-specific steps: lessons collect a training start date, experiences use CMS-configured dates/slots, and events use the CMS fixed schedule without editable date/time steps.
+- Experience availability is stored in the existing `Experience.metadata` JSON to avoid a destructive schema change; admin Experience forms expose line-based date/slot/capacity controls.
+- Booking API validates configured experience slots, lesson/slot capacity, and event status/expiry, derives event schedule server-side, and snapshots authoritative per-participant pricing and totals.
+- Booking references now include type prefixes for new records; existing references remain unchanged.

@@ -20,8 +20,9 @@ function toDateOnlyString(value: Date) {
   return value.toISOString().slice(0, 10)
 }
 
-function formatBookingReference(id: number, createdAt: Date) {
-  return `${BOOKING_REFERENCE_PREFIX}-${createdAt.getUTCFullYear()}-${String(id).padStart(6, '0')}`
+function formatBookingReference(id: number, createdAt: Date, type?: BookingType) {
+  const prefix = type === 'LESSON' ? 'LESSON' : type === 'EXPERIENCE' ? 'EXP' : type === 'EVENT' ? 'EVENT' : ''
+  return `${BOOKING_REFERENCE_PREFIX}-${prefix ? `${prefix}-` : ''}${createdAt.getUTCFullYear()}-${String(id).padStart(6, '0')}`
 }
 
 function consumesEventCapacity(status: BookingStatus) {
@@ -57,11 +58,12 @@ function toBookingResponse(booking: BookingRecord) {
       ? booking.experience
       : booking.event
 
-  const bookingReference = booking.slug || formatBookingReference(booking.id, booking.createdAt)
+  const bookingReference = booking.slug || formatBookingReference(booking.id, booking.createdAt, booking.bookingType)
   const paymentNotice = 'Payment is collected at the venue.'
   const eventAvailability = booking.bookingType === 'EVENT' && booking.event
     ? resolveAvailability(booking.event.capacityMax, booking.event.currentParticipants)
     : null
+  const metadata = booking.metadata && typeof booking.metadata === 'object' && !Array.isArray(booking.metadata) ? booking.metadata as Record<string, unknown> : {}
 
   return {
     id: booking.id,
@@ -70,12 +72,12 @@ function toBookingResponse(booking: BookingRecord) {
     bookingType: booking.bookingType,
     activity: selectedItem?.title || null,
     selectedItem,
-    event: booking.event ? { id: booking.event.id, title: booking.event.title, slug: booking.event.slug } : null,
+    event: booking.event ? { id: booking.event.id, title: booking.event.title, slug: booking.event.slug, startsAt: booking.event.eventStartsAt, endsAt: booking.event.eventEndsAt, startTimeLabel: booking.event.startTimeLabel, endTimeLabel: booking.event.endTimeLabel } : null,
     lesson: booking.lesson ? { id: booking.lesson.id, title: booking.lesson.title, slug: booking.lesson.slug } : null,
     experience: booking.experience ? { id: booking.experience.id, title: booking.experience.title, slug: booking.experience.slug } : null,
     bookingDate: booking.bookingDate,
     bookingDateLabel: toDateOnlyString(booking.bookingDate),
-    preferredTime: booking.preferredTime,
+    preferredTime: booking.preferredTime || (booking.bookingType === 'EVENT' ? [booking.event?.startTimeLabel, booking.event?.endTimeLabel].filter(Boolean).join(' – ') || undefined : undefined),
     participants: booking.participantCount,
     participantCount: booking.participantCount,
     bookingStatus: booking.bookingStatus,
@@ -84,6 +86,7 @@ function toBookingResponse(booking: BookingRecord) {
     paymentNotice,
     location: booking.location?.name ?? booking.event?.locationName ?? booking.beach?.name ?? null,
     eventAvailability,
+    pricing: metadata.pricing || null,
     customer: {
       name: booking.fullName,
       email: booking.email,
@@ -220,10 +223,7 @@ async function ensureEventCanBeBooked(input: BookingCreateInput) {
     throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Event is no longer accepting bookings')
   }
 
-  const eventDate = toDateOnlyString(event.eventStartsAt)
-  if (input.preferredDate !== eventDate) {
-    throw new ApiError(HTTP_STATUS.BAD_REQUEST, `Event date mismatch. Please choose ${eventDate}`)
-  }
+  if (event.eventStartsAt.getTime() <= Date.now()) throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Event has already passed')
 
   const booked = await bookingRepository.sumParticipantsByEvent(event.id, EVENT_CAPACITY_CONSUMING_STATUSES)
   const availability = resolveAvailability(event.capacityMax, booked)
@@ -232,6 +232,27 @@ async function ensureEventCanBeBooked(input: BookingCreateInput) {
   }
 
   return event
+}
+
+async function resolveSchedule(input: BookingCreateInput) {
+  if (input.bookingType === 'EVENT') {
+    const event = await bookingRepository.findEventForCapacity(input.selectedItemId)
+    if (!event) throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Selected event is invalid')
+    return { date: toDateOnlyString(event.eventStartsAt), time: undefined as string | undefined }
+  }
+  if (!input.preferredDate) throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'A start date is required')
+  if (input.bookingType === 'EXPERIENCE') {
+    const item = await bookingRepository.findBookableByType('EXPERIENCE', input.selectedItemId)
+    const rawMetadata = (item as { metadata?: unknown } | null)?.metadata
+    const metadata = rawMetadata && typeof rawMetadata === 'object' && !Array.isArray(rawMetadata) ? rawMetadata as Record<string, unknown> : {}
+    const dates = Array.isArray(metadata.availability) ? metadata.availability as Array<{ date: string; isActive?: boolean; slots?: Array<{ startTime: string; endTime?: string; capacity?: number; isActive?: boolean }> }> : []
+    const date = dates.find((entry) => entry.date === input.preferredDate && entry.isActive !== false)
+    const selectedSlot = date?.slots?.find((slot) => slot.isActive !== false && (`${slot.startTime}-${slot.endTime || ''}` === input.preferredTime || slot.startTime === input.preferredTime))
+    const validSlot = Boolean(selectedSlot)
+    if (!date || !validSlot) throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Selected experience date or time slot is not available')
+    if (selectedSlot?.capacity && input.participants > selectedSlot.capacity) throw new ApiError(HTTP_STATUS.CONFLICT, 'Participant count exceeds this experience slot capacity')
+  }
+  return { date: input.preferredDate, time: input.preferredTime }
 }
 
 async function ensureBookingReference(id: number) {
@@ -244,7 +265,7 @@ async function ensureBookingReference(id: number) {
     return booking
   }
 
-  const reference = formatBookingReference(booking.id, booking.createdAt)
+  const reference = formatBookingReference(booking.id, booking.createdAt, booking.bookingType)
   const updated = await bookingRepository.update(id, { slug: reference })
   return updated
 }
@@ -258,7 +279,7 @@ async function ensureBookingExists(id: number) {
   return booking
 }
 
-function buildCreateData(input: BookingCreateInput, source: 'WEBSITE' | 'ADMIN'): Prisma.BookingCreateInput {
+function buildCreateData(input: BookingCreateInput, source: 'WEBSITE' | 'ADMIN', pricing?: { pricePerParticipant: number | null; total: number }): Prisma.BookingCreateInput {
   const relationData: Pick<Prisma.BookingCreateInput, 'lesson' | 'experience' | 'event'> =
     input.bookingType === 'LESSON'
       ? { lesson: { connect: { id: input.selectedItemId } }, experience: undefined, event: undefined }
@@ -280,9 +301,10 @@ function buildCreateData(input: BookingCreateInput, source: 'WEBSITE' | 'ADMIN')
     emergencyContact: input.emergencyContact,
     notes: input.specialNotes,
     participantCount: input.participants,
-    bookingDate: toBookingDate(input.preferredDate),
+    bookingDate: toBookingDate(input.preferredDate || toDateOnlyString(new Date())),
     preferredTime: input.preferredTime,
     metadata: {
+      pricing: pricing || null,
       notification: {
         email: { enabled: false },
         whatsapp: { enabled: false },
@@ -323,15 +345,18 @@ export const bookingService = {
   },
 
   async create(input: BookingCreateInput, userId?: number) {
-    await ensureBookableItemExists(input.bookingType, input.selectedItemId)
+    const item = await ensureBookableItemExists(input.bookingType, input.selectedItemId)
+    const maxParticipants = (item as { maxParticipants?: number | null }).maxParticipants
+    if (maxParticipants && input.participants > maxParticipants) throw new ApiError(HTTP_STATUS.CONFLICT, 'Participant count exceeds this offering capacity')
     await ensureEventCanBeBooked(input)
+    const schedule = await resolveSchedule(input)
 
     const duplicateCutoff = new Date(Date.now() - 5 * 60 * 1000)
     const duplicate = await bookingRepository.findRecentDuplicate({
       bookingType: input.bookingType,
       selectedItemId: input.selectedItemId,
       email: input.email,
-      bookingDate: toBookingDate(input.preferredDate),
+      bookingDate: toBookingDate(schedule.date),
       participantCount: input.participants,
       createdAfter: duplicateCutoff,
     })
@@ -341,7 +366,9 @@ export const bookingService = {
     }
 
     const source = userId ? 'ADMIN' : 'WEBSITE'
-    const created = await bookingRepository.create(buildCreateData(input, source))
+    const rawPrice = input.bookingType === 'LESSON' ? (item as { price?: unknown }).price : input.bookingType === 'EXPERIENCE' ? (item as { basePrice?: unknown; discountPrice?: unknown }).discountPrice ?? (item as { basePrice?: unknown }).basePrice : (item as { basePrice?: unknown; discountPrice?: unknown }).discountPrice ?? (item as { basePrice?: unknown }).basePrice
+    const pricePerParticipant = rawPrice === null || rawPrice === undefined ? null : Number(rawPrice)
+    const created = await bookingRepository.create(buildCreateData({ ...input, preferredDate: schedule.date, preferredTime: schedule.time }, source, { pricePerParticipant, total: pricePerParticipant === null ? 0 : pricePerParticipant * input.participants }))
 
     if (created.eventId && consumesEventCapacity(created.bookingStatus)) {
       await bookingRepository.adjustEventParticipants(created.eventId, created.participantCount)
@@ -482,6 +509,7 @@ export const bookingService = {
         difficulty: item.difficulty,
         duration: item.duration,
         maxParticipants: item.maxParticipants,
+        pricePerParticipant: item.price,
       })),
       experiences: result.experiences.map((item) => ({
         bookingType: 'EXPERIENCE' as const,
@@ -492,6 +520,8 @@ export const bookingService = {
         difficulty: item.difficulty,
         duration: item.duration,
         maxParticipants: item.maxParticipants,
+        pricePerParticipant: item.discountPrice ?? item.basePrice,
+        availability: (() => { const metadata = item.metadata && typeof item.metadata === 'object' && !Array.isArray(item.metadata) ? item.metadata as Record<string, unknown> : {}; return Array.isArray(metadata.availability) ? metadata.availability : [] })(),
       })),
       events: result.events.map((item) => ({
         bookingType: 'EVENT' as const,
@@ -504,6 +534,8 @@ export const bookingService = {
         maxParticipants: item.capacityMax,
         location: item.locationName,
         eventDate: item.eventStartsAt,
+        eventEnd: item.eventEndsAt,
+        pricePerParticipant: item.discountPrice ?? item.basePrice,
         currentParticipants: item.currentParticipants,
         availability: resolveAvailability(item.capacityMax, item.currentParticipants),
       })),

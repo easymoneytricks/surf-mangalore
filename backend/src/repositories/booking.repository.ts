@@ -5,7 +5,7 @@ import { prisma } from '../lib/prisma'
 const bookingInclude = {
   lesson: { select: { id: true, title: true, slug: true } },
   experience: { select: { id: true, title: true, slug: true } },
-  event: { select: { id: true, title: true, slug: true, capacityMax: true, currentParticipants: true, locationName: true, eventStartsAt: true } },
+  event: { select: { id: true, title: true, slug: true, capacityMax: true, currentParticipants: true, locationName: true, eventStartsAt: true, eventEndsAt: true, startTimeLabel: true, endTimeLabel: true } },
   location: { select: { id: true, name: true, slug: true } },
   beach: { select: { id: true, name: true, slug: true } },
   activityLogs: {
@@ -122,7 +122,7 @@ export const bookingRepository = {
           publishStatus: 'PUBLISHED',
           visibility: 'PUBLIC',
         },
-        select: { id: true, title: true, slug: true, status: true, publishStatus: true, visibility: true, maxParticipants: true },
+        select: { id: true, title: true, slug: true, status: true, publishStatus: true, visibility: true, maxParticipants: true, price: true },
       })
     }
 
@@ -135,7 +135,7 @@ export const bookingRepository = {
           visibility: 'PUBLIC',
           status: 'active',
         },
-        select: { id: true, title: true, slug: true, status: true, publishStatus: true, visibility: true, maxParticipants: true },
+        select: { id: true, title: true, slug: true, status: true, publishStatus: true, visibility: true, maxParticipants: true, basePrice: true, discountPrice: true, metadata: true },
       })
     }
 
@@ -218,12 +218,12 @@ export const bookingRepository = {
       prisma.lesson.findMany({
         where: { deletedAt: null, publishStatus: 'PUBLISHED', visibility: 'PUBLIC' },
         orderBy: { displayOrder: 'desc' },
-        select: { id: true, title: true, slug: true, shortDescription: true, difficulty: true, duration: true, maxParticipants: true },
+        select: { id: true, title: true, slug: true, shortDescription: true, difficulty: true, duration: true, maxParticipants: true, price: true },
       }),
       prisma.experience.findMany({
         where: { deletedAt: null, publishStatus: 'PUBLISHED', visibility: 'PUBLIC', status: 'active' },
         orderBy: { displayOrder: 'desc' },
-        select: { id: true, title: true, slug: true, shortDescription: true, difficulty: true, duration: true, maxParticipants: true },
+        select: { id: true, title: true, slug: true, shortDescription: true, difficulty: true, duration: true, maxParticipants: true, basePrice: true, discountPrice: true, metadata: true },
       }),
       prisma.event.findMany({
         where: { deletedAt: null, publishStatus: 'PUBLISHED', visibility: 'PUBLIC', status: 'active' },
@@ -239,6 +239,9 @@ export const bookingRepository = {
           currentParticipants: true,
           locationName: true,
           eventStartsAt: true,
+          eventEndsAt: true,
+          basePrice: true,
+          discountPrice: true,
         },
       }),
     ])

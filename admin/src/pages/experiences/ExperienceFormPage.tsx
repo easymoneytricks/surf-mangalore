@@ -21,7 +21,7 @@ import {
 import { lessonsService } from '../../services/lessons.service'
 import { experiencesService } from '../../services/experiences.service'
 import { type LessonEntity } from '../../types/lessons'
-import { type ExperienceMutationInput } from '../../types/experiences'
+import { type ExperienceMutationInput, type ExperienceAvailability } from '../../types/experiences'
 import { slugify } from '../../utils/slug'
 
 type ExperienceFormPageProps = {
@@ -51,6 +51,7 @@ const DEFAULT_FORM: ExperienceMutationInput = {
   displayOrder: 0,
   seoTitle: '',
   seoDescription: '',
+  availability: [],
 }
 
 export default function ExperienceFormPage({ mode }: ExperienceFormPageProps) {
@@ -153,6 +154,7 @@ export default function ExperienceFormPage({ mode }: ExperienceFormPageProps) {
           displayOrder: experience.displayOrder,
           seoTitle: experience.seoTitle || '',
           seoDescription: experience.seoDescription || '',
+          availability: experience.availability || [],
         })
         setLoading(false)
       })
@@ -182,6 +184,7 @@ export default function ExperienceFormPage({ mode }: ExperienceFormPageProps) {
   }, [form, draftStorageKey, hasUnsavedChanges])
 
   const galleryInput = useMemo(() => form.galleryImageUrls.join('\n'), [form.galleryImageUrls])
+  const availabilityInput = useMemo(() => (form.availability || []).flatMap((day) => day.slots.map((slot) => `${day.date}|${slot.startTime}|${slot.endTime || ''}|${slot.capacity || ''}|${day.isActive === false || slot.isActive === false ? 'inactive' : 'active'}`)).join('\n'), [form.availability])
 
   const setField = <K extends keyof ExperienceMutationInput>(field: K, value: ExperienceMutationInput[K]) => {
     setHasUnsavedChanges(true)
@@ -311,6 +314,20 @@ export default function ExperienceFormPage({ mode }: ExperienceFormPageProps) {
                   }))}
                   onChange={(values) => setField('linkedLessonIds', values.map((value) => Number(value)).filter(Number.isFinite))}
                 />
+              </FormSection>
+
+              <FormSection title="Availability and Time Slots" description="One slot per line: YYYY-MM-DD|start|end|capacity|active. Only active configured slots are bookable.">
+                <TextareaInput label="Available Dates and Slots" value={availabilityInput} className="sm:col-span-2" onChange={(event) => {
+                  const grouped = new Map<string, ExperienceAvailability>()
+                  event.target.value.split('\n').map((line) => line.trim()).filter(Boolean).forEach((line) => {
+                    const [date, startTime, endTime, capacity, status] = line.split('|').map((part) => part.trim())
+                    if (!date || !startTime) return
+                    const day = grouped.get(date) || { date, isActive: status !== 'inactive', slots: [] }
+                    day.slots.push({ startTime, endTime: endTime || undefined, capacity: capacity ? Number(capacity) : undefined, isActive: status !== 'inactive' })
+                    grouped.set(date, day)
+                  })
+                  setField('availability', Array.from(grouped.values()))
+                }} />
               </FormSection>
 
               <FormSection title="Media and SEO" description="Cover image, gallery image URLs, and SEO metadata.">

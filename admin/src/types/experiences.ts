@@ -2,6 +2,7 @@ export type PublishStatus = 'DRAFT' | 'REVIEW' | 'PUBLISHED' | 'UNPUBLISHED' | '
 export type Visibility = 'PUBLIC' | 'PRIVATE' | 'UNLISTED'
 export type ExperienceDifficulty = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'ALL_LEVELS'
 export type ExperienceStatus = 'active' | 'inactive'
+export type ExperienceAvailability = { date: string; isActive?: boolean; slots: Array<{ startTime: string; endTime?: string; capacity?: number; isActive?: boolean }> }
 
 export type LinkedLessonSummary = {
   id: number
@@ -39,6 +40,7 @@ export type ExperienceEntity = {
   displayOrder: number
   seoTitle?: string
   seoDescription?: string
+  availability?: ExperienceAvailability[]
   audit: {
     createdAt: string
     updatedAt: string
@@ -86,4 +88,5 @@ export type ExperienceMutationInput = {
   displayOrder: number
   seoTitle?: string
   seoDescription?: string
+  availability?: ExperienceAvailability[]
 }

@@ -20,6 +20,7 @@ export const DEFAULT_WEBSITE_SETTINGS = {
     heroCtaButton2Label: 'Explore The Experience',
     heroCtaButton2Path: '/gallery',
     heroBackgroundImageUrl: '/images/placeholders/sunset.svg',
+    heroDroneShotImageUrl: '/images/placeholders/drone.svg',
     announcementBanner: 'Award-winning surf school · Mangalore',
     homepageFeaturedSectionToggle: true,
   },

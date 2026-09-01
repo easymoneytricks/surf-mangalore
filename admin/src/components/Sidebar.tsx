@@ -31,7 +31,7 @@ export default function Sidebar({ isCollapsed, isMobileOpen, onCloseMobile }: Si
           {!isCollapsed ? (
             <div>
               <p className="text-sm font-semibold text-(--color-text)">Surf Mangalore</p>
-              <p className="text-xs text-(--color-text-secondary)">Admin Workspace</p>
+              <p className="text-xs text-(--color-text-secondary)">Admin Panel</p>
             </div>
           ) : null}
         </div>

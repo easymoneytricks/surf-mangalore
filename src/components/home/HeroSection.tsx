@@ -4,7 +4,6 @@ import Badge from '../Badge'
 import Card from '../Card'
 import { navigateTo } from '../../utils/navigation'
 import { useWebsiteSettings } from '../../contexts/WebsiteSettingsContext'
-
 export default function HeroSection() {
   const { settings } = useWebsiteSettings()
 
@@ -53,16 +52,14 @@ export default function HeroSection() {
             <Card variant="image" className="relative overflow-hidden border-white/15 p-0">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(122,214,209,0.24),transparent_30%),linear-gradient(180deg,rgba(4,19,27,0.12),rgba(4,19,27,0.82))]" />
               <div className="relative aspect-[4/5] bg-[linear-gradient(135deg,rgba(122,214,209,0.16),rgba(255,143,74,0.16))] bg-cover bg-center" style={{ backgroundImage: `linear-gradient(135deg,rgba(122,214,209,0.16),rgba(255,143,74,0.16)), url('${settings.homepage.heroBackgroundImageUrl || '/images/placeholders/sunset.svg'}')` }} />
-              <div className="absolute inset-x-0 bottom-0 p-6">
-                <p className="text-[0.72rem] uppercase tracking-[0.32em] text-[var(--color-primary)]">Professional surf photography</p>
-                <h2 className="mt-2 text-[1.55rem] font-semibold leading-tight text-white">Golden-hour sessions with a cinematic edge.</h2>
+              <div className="absolute inset-x-0 bottom-0 z-10 p-6">
               </div>
             </Card>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="absolute left-0 top-[6%] w-[54%]">
             <Card variant="glass" className="border-white/15 p-4">
-              <div className="aspect-[3/4] rounded-[1.15rem] border border-white/10 bg-[linear-gradient(135deg,rgba(122,214,209,0.16),rgba(255,143,74,0.12)),url('/images/placeholders/drone.svg')] bg-cover bg-center" />
+              <div className="aspect-[3/4] rounded-[1.15rem] border border-white/10 bg-[linear-gradient(135deg,rgba(122,214,209,0.16),rgba(255,143,74,0.12))] bg-cover bg-center" style={{ backgroundImage: `linear-gradient(135deg,rgba(122,214,209,0.16),rgba(255,143,74,0.12)), url('${settings.homepage.heroDroneShotImageUrl || '/images/placeholders/drone.svg'}')` }} />
               <p className="mt-3 text-[0.72rem] uppercase tracking-[0.32em] text-[var(--color-text-secondary)]">Drone shot</p>
             </Card>
           </motion.div>
@@ -74,6 +71,8 @@ export default function HeroSection() {
               <p className="mt-1 text-sm leading-7 text-[var(--color-text-secondary)]">Certified surf coaches · beginner friendly · ocean-safe guidance.</p>
             </Card>
           </motion.div>
+
+          <h2 className="pointer-events-none absolute bottom-[22%] right-[10%] z-20 max-w-[11ch] rounded-[1rem] bg-[rgba(4,19,27,0.78)] px-3 py-2 text-right text-[1.55rem] font-semibold leading-tight text-white shadow-[0_12px_30px_rgba(4,19,27,0.24)] backdrop-blur-sm">Golden-hour sessions with a cinematic edge.</h2>
         </div>
       </div>
     </section>

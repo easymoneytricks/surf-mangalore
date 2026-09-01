@@ -46,6 +46,7 @@ export const websiteSettingsBodySchema = z.object({
     heroCtaButton2Label: z.string().trim().min(1).max(80),
     heroCtaButton2Path: z.string().trim().min(1).max(220),
     heroBackgroundImageUrl: z.string().trim().min(1).max(260),
+    heroDroneShotImageUrl: z.string().trim().min(1).max(260),
     announcementBanner: z.string().trim().max(200),
     homepageFeaturedSectionToggle: z.boolean(),
   }),

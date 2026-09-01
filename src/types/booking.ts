@@ -11,6 +11,11 @@ export type BookingSelectableItem = {
   level: string
   groupSize: string
   badge: string
+  pricePerParticipant?: number | null
+  eventStart?: string | null
+  eventEnd?: string | null
+  eventLocation?: string | null
+  availability?: Array<{ date: string; slots: Array<{ id: string; label: string; period: string; capacity?: number | null }> }>
 }
 
 export type BookingFormData = {
@@ -31,7 +36,7 @@ export type BookingFieldError = Partial<Record<keyof BookingFormData, string>>
 export type BookingCreatePayload = {
   bookingType: PublicBookingType
   selectedItemId: number
-  preferredDate: string
+  preferredDate?: string
   preferredTime?: string
   participants: number
   customerName: string

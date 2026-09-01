@@ -32,6 +32,7 @@ export type WebsiteSettings = {
     heroCtaButton2Label: string
     heroCtaButton2Path: string
     heroBackgroundImageUrl: string
+    heroDroneShotImageUrl: string
     announcementBanner: string
     homepageFeaturedSectionToggle: boolean
   }

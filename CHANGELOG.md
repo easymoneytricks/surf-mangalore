@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-01 - Booking Availability Shape Fix
+
+- Normalized booking availability defensively at the public booking API adapter so legacy/non-array Lesson/Event values cannot trigger runtime errors.
+- Kept availability semantics type-aware and added seeded published Lesson, Experience availability slots, and future Event demo records for QA.
+
+## 2026-09-01 - Booking Semantics Correction
+
+- Adapted booking steps and server validation for lesson reservations, configured experience slots, and fixed-schedule event tickets.
+- Added Experience availability controls backed by existing metadata, server-side schedule and price authority, and type-prefixed references for new bookings.
+
+## 2026-08-31 - Homepage Hero CMS and Admin Copy Follow-up
+
+- Added the `homepage.heroDroneShotImageUrl` CMS setting with the existing Drone Shot asset retained as the default/fallback.
+- Added the Hero Drone Shot Image URL control to Admin Settings > Homepage and validation to the existing settings API contract.
+- Made the hero visual headline readable within the existing overlapping-card composition.
+- Added the slug-based `View lesson` CTA to homepage lesson cards and updated the requested admin wording.
+
 ## 2026-08-01 - Phase 3 Sprint 8 Media Library Reusable Asset Infrastructure
 
 - Added Media Management backend module with APIs for list, upload, detail, update/replace, and soft delete.

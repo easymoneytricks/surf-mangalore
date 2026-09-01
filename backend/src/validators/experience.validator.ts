@@ -64,6 +64,16 @@ const experienceMutationBaseSchema = z.object({
   displayOrder: z.coerce.number().int().min(0).max(10000).default(0),
   seoTitle: z.string().trim().max(160).optional(),
   seoDescription: z.string().trim().max(320).optional(),
+  availability: z.array(z.object({
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    isActive: z.boolean().optional().default(true),
+    slots: z.array(z.object({
+      startTime: z.string().trim().min(1).max(20),
+      endTime: z.string().trim().max(20).optional(),
+      capacity: z.coerce.number().int().positive().max(10000).optional(),
+      isActive: z.boolean().optional().default(true),
+    })).max(50),
+  })).max(366).optional(),
 })
 
 function validateExperienceBusinessRules(value: Partial<z.infer<typeof experienceMutationBaseSchema>>, ctx: z.RefinementCtx) {

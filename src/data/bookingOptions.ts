@@ -45,6 +45,12 @@ export const bookingSteps: BookingStepConfig[] = [
   },
 ]
 
+export function bookingStepsForType(type: 'LESSON' | 'EXPERIENCE' | 'EVENT' | ''): BookingStepConfig[] {
+  if (type === 'LESSON') return bookingSteps.filter((step) => step.id !== 'time')
+  if (type === 'EVENT') return bookingSteps.filter((step) => !['date', 'time'].includes(step.id))
+  return bookingSteps
+}
+
 export const bookingTimeSlots: BookingTimeSlot[] = [
   { id: '06:30', label: '6:30 AM', period: 'Sunrise lineup' },
   { id: '08:30', label: '8:30 AM', period: 'Morning prime' },

@@ -13,6 +13,8 @@ type BookableOptionsResponse = {
       difficulty?: string | null
       duration?: string | null
       maxParticipants?: number | null
+      pricePerParticipant?: number | string | null
+      availability?: Array<{ date: string; isActive?: boolean; slots?: Array<{ id?: string; startTime: string; endTime?: string | null; capacity?: number | null; isActive?: boolean }> }>
     }>
     experiences: Array<{
       bookingType: PublicBookingType
@@ -22,6 +24,8 @@ type BookableOptionsResponse = {
       difficulty?: string | null
       duration?: string | null
       maxParticipants?: number | null
+      pricePerParticipant?: number | string | null
+      availability?: Array<{ date: string; isActive?: boolean; slots?: Array<{ id?: string; startTime: string; endTime?: string | null; capacity?: number | null; isActive?: boolean }> }>
     }>
     events: Array<{
       bookingType: PublicBookingType
@@ -31,6 +35,10 @@ type BookableOptionsResponse = {
       difficulty?: string | null
       duration?: string | null
       maxParticipants?: number | null
+      pricePerParticipant?: number | string | null
+      eventDate?: string
+      eventEnd?: string | null
+      location?: string | null
     }>
   }
 }
@@ -49,7 +57,23 @@ function difficultyToLabel(value?: string | null) {
   return `${value.charAt(0)}${value.slice(1).toLowerCase()}`
 }
 
-function mapItems(items: Array<{ bookingType: PublicBookingType; id: number; title: string; description?: string | null; difficulty?: string | null; duration?: string | null; maxParticipants?: number | null }>): BookingSelectableItem[] {
+type RawAvailabilityDate = { date: string; isActive?: boolean; slots?: Array<{ id?: string; startTime: string; endTime?: string | null; capacity?: number | null; isActive?: boolean }> }
+
+function normalizeAvailability(value: unknown): NonNullable<BookingSelectableItem['availability']> {
+  if (!Array.isArray(value)) return []
+
+  return (value as RawAvailabilityDate[]).filter((date) => date && typeof date.date === 'string' && date.isActive !== false).map((date) => ({
+    date: date.date.slice(0, 10),
+    slots: (Array.isArray(date.slots) ? date.slots : []).filter((slot) => slot && typeof slot.startTime === 'string' && slot.isActive !== false).map((slot) => ({
+      id: slot.id || `${slot.startTime}-${slot.endTime || ''}`,
+      label: slot.startTime,
+      period: slot.endTime ? `Until ${slot.endTime}` : 'Available slot',
+      capacity: slot.capacity,
+    })),
+  }))
+}
+
+function mapItems(items: Array<{ bookingType: PublicBookingType; id: number; title: string; description?: string | null; difficulty?: string | null; duration?: string | null; maxParticipants?: number | null; pricePerParticipant?: number | string | null; availability?: unknown; eventDate?: string; eventEnd?: string | null; location?: string | null }>): BookingSelectableItem[] {
   return items.map((item) => ({
     id: item.id,
     bookingType: item.bookingType,
@@ -59,6 +83,11 @@ function mapItems(items: Array<{ bookingType: PublicBookingType; id: number; tit
     level: difficultyToLabel(item.difficulty),
     groupSize: item.maxParticipants ? `1 to ${item.maxParticipants} guests` : 'Flexible group size',
     badge: item.bookingType,
+    pricePerParticipant: item.pricePerParticipant === null || item.pricePerParticipant === undefined ? null : Number(item.pricePerParticipant),
+    eventStart: item.eventDate || null,
+    eventEnd: item.eventEnd || null,
+    eventLocation: item.location || null,
+    availability: item.bookingType === 'EXPERIENCE' ? normalizeAvailability(item.availability) : [],
   }))
 }
 

@@ -12,7 +12,7 @@ export default function TimeSelector({ slots, value, error, onChange }: TimeSele
     <div>
       <fieldset>
         <legend className="text-xl font-semibold text-[var(--color-text)]">Choose preferred time</legend>
-        <p className="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">Choose a slot and we will confirm exact arrival guidance after your request.</p>
+        <p className="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">Choose an available slot for this experience.</p>
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {slots.map((slot) => {
             const selected = value === slot.id
@@ -29,6 +29,7 @@ export default function TimeSelector({ slots, value, error, onChange }: TimeSele
           })}
         </div>
       </fieldset>
+      {!slots.length ? <p className="mt-3 text-sm text-(--color-text-secondary)">No slots are configured for this date.</p> : null}
       {error ? <p role="alert" className="mt-3 text-sm text-rose-300">{error}</p> : null}
     </div>
   )

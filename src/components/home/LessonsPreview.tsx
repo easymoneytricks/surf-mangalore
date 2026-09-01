@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import Badge from '../Badge'
+import Button from '../Button'
 import Card from '../Card'
 import { fetchLessons } from '../../services/lessons.service'
+import { navigateTo } from '../../utils/navigation'
 
 type LessonCardModel = {
   title: string
@@ -80,6 +82,11 @@ export default function LessonsPreview() {
                 {lesson.price !== undefined && lesson.price !== null ? (
                   <div className="mt-3 text-sm text-[var(--color-primary)]">From ₹{lesson.price}</div>
                 ) : null}
+                <div className="mt-5">
+                  <Button variant="outline" size="sm" onClick={() => navigateTo(`/lessons/${lesson.slug}`)} className="w-full">
+                    View lesson
+                  </Button>
+                </div>
               </Card>
             </motion.div>
           ))}

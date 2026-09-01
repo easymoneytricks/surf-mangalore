@@ -24,7 +24,7 @@ export type BookingEntity = {
     title: string
     slug: string
   } | null
-  event?: { id: number; title: string; slug: string } | null
+  event?: { id: number; title: string; slug: string; startsAt?: string; endsAt?: string | null; startTimeLabel?: string | null; endTimeLabel?: string | null } | null
   lesson?: { id: number; title: string; slug: string } | null
   experience?: { id: number; title: string; slug: string } | null
   bookingDate: string

@@ -164,6 +164,7 @@ export default function WebsiteSettingsPage() {
           <Field label="Hero CTA 2 Label" value={settings.homepage.heroCtaButton2Label} onChange={(value) => update('homepage', { ...settings.homepage, heroCtaButton2Label: value })} />
           <Field label="Hero CTA 2 Path" value={settings.homepage.heroCtaButton2Path} onChange={(value) => update('homepage', { ...settings.homepage, heroCtaButton2Path: value })} />
           <Field label="Hero Background Image URL" value={settings.homepage.heroBackgroundImageUrl} onChange={(value) => update('homepage', { ...settings.homepage, heroBackgroundImageUrl: value })} />
+          <Field label="Hero Drone Shot Image URL" value={settings.homepage.heroDroneShotImageUrl} onChange={(value) => update('homepage', { ...settings.homepage, heroDroneShotImageUrl: value })} />
           <label className="flex items-center gap-3 rounded-xl border border-neutral-800 px-3 py-3 text-sm text-neutral-300">
             <input
               type="checkbox"

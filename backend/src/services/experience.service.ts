@@ -86,6 +86,7 @@ const baseExperienceCrudService = new BaseContentService<
 })
 
 function toExperienceResponse(experience: ExperienceRecord) {
+  const metadata = experience.metadata && typeof experience.metadata === 'object' && !Array.isArray(experience.metadata) ? experience.metadata as Record<string, unknown> : {}
   return {
     id: experience.id,
     uuid: experience.uuid,
@@ -120,6 +121,7 @@ function toExperienceResponse(experience: ExperienceRecord) {
     })),
     seoTitle: experience.seoTitle,
     seoDescription: experience.seoDescription,
+    availability: Array.isArray(metadata.availability) ? metadata.availability : [],
     audit: {
       createdAt: experience.createdAt,
       updatedAt: experience.updatedAt,
@@ -186,11 +188,7 @@ function toCreateData(input: ExperienceMutationInput, userId?: number): Prisma.E
     displayOrder: input.displayOrder,
     seoTitle: seo.seoTitle,
     seoDescription: seo.seoDescription,
-    metadata: {
-      futureInstructorIds: [],
-      futureCategoryIds: [],
-      futureImageAssetIds: [],
-    },
+    metadata: { futureInstructorIds: [], futureCategoryIds: [], futureImageAssetIds: [], availability: input.availability || [] },
     ...withCreateAudit({}, userId),
   }
 }
@@ -229,6 +227,7 @@ function toUpdateData(input: Partial<ExperienceMutationInput>, userId?: number):
     ...(input.displayOrder !== undefined ? { displayOrder: input.displayOrder } : {}),
     ...(input.seoTitle !== undefined ? { seoTitle: seo.seoTitle } : {}),
     ...(input.seoDescription !== undefined ? { seoDescription: seo.seoDescription } : {}),
+    ...(input.availability !== undefined ? { metadata: { availability: input.availability } } : {}),
   }
 
   return withUpdateAudit(data, userId)

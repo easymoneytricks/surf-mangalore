@@ -83,8 +83,8 @@ export const bookingListQuerySchema = z.object({
 export const bookingCreateBodySchema = z.object({
   bookingType: z.enum(BOOKING_TYPES),
   selectedItemId: z.coerce.number().int().positive(),
-  preferredDate: z.string().refine((value) => isValidDateOnly(value), { message: 'preferredDate must be in YYYY-MM-DD format' })
-    .refine((value) => isFutureOrTodayDateString(value), { message: 'preferredDate cannot be in the past' }),
+  preferredDate: z.string().optional().refine((value) => value === undefined || isValidDateOnly(value), { message: 'preferredDate must be in YYYY-MM-DD format' })
+    .refine((value) => value === undefined || isFutureOrTodayDateString(value), { message: 'preferredDate cannot be in the past' }),
   preferredTime: z.string().trim().max(80).optional(),
   participants: z.coerce.number().int().min(1).max(20),
   customerName: z.string().trim().min(2).max(120),
@@ -92,6 +92,9 @@ export const bookingCreateBodySchema = z.object({
   phone: z.string().trim().min(8).max(24),
   emergencyContact: z.string().trim().max(160).optional(),
   specialNotes: z.string().trim().max(2000).optional(),
+}).superRefine((value, ctx) => {
+  if (value.bookingType !== 'EVENT' && !value.preferredDate) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['preferredDate'], message: 'preferredDate is required for this booking type' })
+  if (value.bookingType === 'EXPERIENCE' && !value.preferredTime) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['preferredTime'], message: 'preferredTime is required for experiences' })
 })
 
 export const bookingStatusPatchBodySchema = z.object({

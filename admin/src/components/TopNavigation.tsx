@@ -88,7 +88,7 @@ export default function TopNavigation({ onToggleSidebar, onToggleCollapse, isCol
               setSearchTerm(value)
               setSearchOpen(true)
             }}
-            placeholder="Global CMS search"
+            placeholder="Search"
           />
           {searchOpen ? (
             <div className="absolute right-0 top-12 z-[60] w-[26rem] max-w-[88vw] rounded-2xl border border-white/15 bg-[var(--color-surface)] p-2 shadow-xl">

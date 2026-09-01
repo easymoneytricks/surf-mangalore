@@ -725,6 +725,15 @@ async function upsertSampleMediaAndGallery() {
   }
 }
 
+async function upsertSampleBookableProducts() {
+  const future = new Date()
+  future.setUTCDate(future.getUTCDate() + 14)
+  const eventEnd = new Date(future.getTime() + 2 * 60 * 60 * 1000)
+  await prisma.lesson.upsert({ where: { slug: 'beginner-surf-foundations' }, update: { status: 'active', publishStatus: PublishStatus.PUBLISHED, visibility: Visibility.PUBLIC, price: 1800, maxParticipants: 6 }, create: { slug: 'beginner-surf-foundations', name: 'Beginner Surf Foundations', title: 'Beginner Surf Foundations', shortDescription: 'A calm, coached introduction to surfing.', description: 'A calm, coached introduction to surfing.', status: 'active', publishStatus: PublishStatus.PUBLISHED, visibility: Visibility.PUBLIC, level: 'BEGINNER', difficulty: 'BEGINNER', duration: '2 hours', durationMinutes: 120, price: 1800, maxParticipants: 6 } })
+  await prisma.experience.upsert({ where: { slug: 'sunset-coastal-paddle' }, update: { status: 'active', publishStatus: PublishStatus.PUBLISHED, visibility: Visibility.PUBLIC, basePrice: 2200, metadata: { availability: [{ date: future.toISOString().slice(0, 10), isActive: true, slots: [{ startTime: '16:00', endTime: '18:00', capacity: 8, isActive: true }, { startTime: '17:00', endTime: '19:00', capacity: 8, isActive: true }] }, { date: new Date(future.getTime() + 86400000).toISOString().slice(0, 10), isActive: true, slots: [{ startTime: '07:00', endTime: '09:00', capacity: 8, isActive: true }] }] } }, create: { slug: 'sunset-coastal-paddle', name: 'Sunset Coastal Paddle', title: 'Sunset Coastal Paddle', shortDescription: 'A guided coastal activity with calm-water timing.', description: 'A guided coastal activity with calm-water timing.', status: 'active', publishStatus: PublishStatus.PUBLISHED, visibility: Visibility.PUBLIC, difficulty: 'ALL_LEVELS', duration: '2 hours', durationMinutes: 120, basePrice: 2200, maxParticipants: 8, metadata: { availability: [{ date: future.toISOString().slice(0, 10), isActive: true, slots: [{ startTime: '16:00', endTime: '18:00', capacity: 8, isActive: true }, { startTime: '17:00', endTime: '19:00', capacity: 8, isActive: true }] }, { date: new Date(future.getTime() + 86400000).toISOString().slice(0, 10), isActive: true, slots: [{ startTime: '07:00', endTime: '09:00', capacity: 8, isActive: true }] }] } } })
+  await prisma.event.upsert({ where: { slug: 'mangalore-surf-community-day' }, update: { status: 'active', eventStatus: 'SCHEDULED', publishStatus: PublishStatus.PUBLISHED, visibility: Visibility.PUBLIC, eventStartsAt: future, eventEndsAt: eventEnd, startTimeLabel: '10:00 AM', endTimeLabel: '12:00 PM', basePrice: 1200, capacityMax: 40 }, create: { slug: 'mangalore-surf-community-day', name: 'Mangalore Surf Community Day', title: 'Mangalore Surf Community Day', shortDescription: 'A fixed-schedule community surf event.', description: 'A fixed-schedule community surf event.', status: 'active', eventStatus: 'SCHEDULED', publishStatus: PublishStatus.PUBLISHED, visibility: Visibility.PUBLIC, eventStartsAt: future, eventEndsAt: eventEnd, startTimeLabel: '10:00 AM', endTimeLabel: '12:00 PM', basePrice: 1200, capacityMax: 40 } })
+}
+
 async function main() {
   if (env.NODE_ENV === 'production') {
     throw new Error('Refusing to run the development seed script in production')
@@ -740,6 +749,7 @@ async function main() {
   await upsertSampleFaqs()
   await upsertSampleContactMessages()
   await upsertSampleMediaAndGallery()
+  await upsertSampleBookableProducts()
 }
 
 main()

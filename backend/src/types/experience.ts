@@ -52,4 +52,11 @@ export type ExperienceMutationInput = {
   displayOrder: number
   seoTitle?: string
   seoDescription?: string
+  availability?: ExperienceAvailabilityInput[]
+}
+
+export type ExperienceAvailabilityInput = {
+  date: string
+  isActive?: boolean
+  slots: Array<{ startTime: string; endTime?: string; capacity?: number; isActive?: boolean }>
 }

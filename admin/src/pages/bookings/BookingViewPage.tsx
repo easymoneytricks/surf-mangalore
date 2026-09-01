@@ -132,8 +132,8 @@ export default function BookingViewPage() {
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           <DetailCard title="Booking Type">{booking.bookingType}</DetailCard>
           <DetailCard title="Selected Item">{booking.selectedItem?.title || '-'}</DetailCard>
-          <DetailCard title="Booking Date">{new Date(booking.bookingDate).toISOString().slice(0, 10)}</DetailCard>
-          <DetailCard title="Preferred Time">{booking.preferredTime || '-'}</DetailCard>
+          <DetailCard title={booking.bookingType === 'LESSON' ? 'Training Start Date' : booking.bookingType === 'EVENT' ? 'Event Date' : 'Experience Date'}>{new Date(booking.bookingDate).toISOString().slice(0, 10)}</DetailCard>
+          <DetailCard title={booking.bookingType === 'EVENT' ? 'Event Start / End Time' : booking.bookingType === 'EXPERIENCE' ? 'Experience Time Slot' : 'Training Time'}>{booking.preferredTime || (booking.bookingType === 'EVENT' ? `${booking.event?.startTimeLabel || ''}${booking.event?.endTimeLabel ? ` – ${booking.event.endTimeLabel}` : ''}` : '-')}</DetailCard>
           <DetailCard title="Participants">{booking.participants}</DetailCard>
           <DetailCard title="Activity">{booking.activity || booking.selectedItem?.title || '-'}</DetailCard>
           <DetailCard title="Location">{booking.location || '-'}</DetailCard>

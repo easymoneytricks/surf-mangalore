@@ -25,7 +25,7 @@ export type BookingListQuery = {
 export type BookingCreateInput = {
   bookingType: BookingTypeValue
   selectedItemId: number
-  preferredDate: string
+  preferredDate?: string
   preferredTime?: string
   participants: number
   customerName: string
