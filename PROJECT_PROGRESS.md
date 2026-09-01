@@ -476,3 +476,4 @@
 - Added native public Privacy Policy and Terms & Conditions pages at `/privacy` and `/terms`; footer legal labels now navigate to these routes and contact details are read from Site Settings.
 - Corrected homepage Upcoming Experiences to use published Experience records and their CMS cover images, with safe fallback imagery. About Community and Featured Event visuals now resolve configured/record images consistently without blank panels.
 - Completed Contact Page settings integration: hero copy/CTAs/image, location details, and Google Maps Embed URL are now settings-driven with safe fallbacks and iframe rendering for valid embed URLs.
+- Refined only the Admin login page into a focused two-column SurfMangalore gateway, removing fake metrics and implementation details while preserving authentication behavior.

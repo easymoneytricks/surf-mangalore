@@ -164,6 +164,35 @@ select {
   min-height: 2.75rem;
 }
 
+/* Keep native option popups readable against the approved dark UI. */
+select {
+  color-scheme: dark;
+}
+
+select option,
+select optgroup {
+  background-color: var(--color-surface-strong, #081c28);
+  color: var(--color-text, #f5fbff);
+}
+
+select option:disabled {
+  color: var(--color-text-secondary, #9db2bf);
+}
+
+html[data-admin-theme='light'] select {
+  color-scheme: light;
+}
+
+html[data-admin-theme='light'] select option,
+html[data-admin-theme='light'] select optgroup {
+  background-color: var(--color-surface, #ffffff);
+  color: var(--color-text, #153041);
+}
+
+html[data-admin-theme='light'] select option:disabled {
+  color: var(--color-text-secondary, #486273);
+}
+
 :focus-visible {
   outline: 2px solid rgba(122, 214, 209, 0.8);
   outline-offset: 2px;
