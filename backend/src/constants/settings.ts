@@ -1,6 +1,11 @@
 export const WEBSITE_SETTINGS_KEY = 'website_settings'
 
 export const DEFAULT_WEBSITE_SETTINGS = {
+  about: {},
+  experiencePage: {},
+  lessonPage: {},
+  eventPage: {},
+  galleryPage: {},
   general: {
     websiteName: 'Surf Mangalore',
     tagline: 'Premium surf coaching and ocean-first experiences',

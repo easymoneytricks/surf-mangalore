@@ -28,7 +28,25 @@ export const API_BASE_URL = getPublicApiBaseUrl()
 
 export async function safeFetch(input: string, init: RequestInit | undefined, fallbackMessage: string) {
   try {
-    return await fetch(input, init)
+    const response = await fetch(input, init)
+    const contentType = response.headers.get('content-type') || ''
+    if (!contentType.toLowerCase().includes('application/json')) {
+      return new Response(JSON.stringify({ success: false, message: response.status === 429 ? 'Too many requests. Please try again shortly.' : fallbackMessage }), {
+        status: response.status,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    try {
+      await response.clone().json()
+    } catch {
+      return new Response(JSON.stringify({ success: false, message: fallbackMessage }), {
+        status: response.status,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    return response
   } catch {
     throw new Error(fallbackMessage)
   }

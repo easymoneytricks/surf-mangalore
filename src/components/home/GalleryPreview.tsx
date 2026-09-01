@@ -12,7 +12,7 @@ export default function GalleryPreview() {
   useEffect(() => {
     let cancelled = false
 
-    fetchGalleryItems()
+    fetchGalleryItems({ featuredOnly: true, pageSize: 3 })
       .then((items) => {
         if (!cancelled) {
           setFeaturedItems(items.filter((item) => item.featured).slice(0, 3))

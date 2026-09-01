@@ -444,3 +444,32 @@
 - Experience availability is stored in the existing `Experience.metadata` JSON to avoid a destructive schema change; admin Experience forms expose line-based date/slot/capacity controls.
 - Booking API validates configured experience slots, lesson/slot capacity, and event status/expiry, derives event schedule server-side, and snapshots authoritative per-participant pricing and totals.
 - Booking references now include type prefixes for new records; existing references remain unchanged.
+
+## Demo Booking Dataset Expansion (2026-09-01)
+
+- Expanded the existing idempotent Prisma seed with 10 published lessons, 10 published experiences with future date/slot availability, 10 future fixed-schedule events, and 10 fictional active coaches.
+- Added deterministic lesson/experience coach relationships using the existing join models.
+- Seed execution requires the existing `SEED_ADMIN_PASSWORD` guard; no database reset or destructive cleanup was introduced.
+- Corrected the Event seed payload to match the current schema by removing unsupported `displayOrder`; Prisma generate, backend build, and the full idempotent seed now complete successfully.
+- Added 15 additional remote Unsplash gallery/media records through the existing idempotent Media and GalleryImage seed flow.
+
+## API Reliability Hardening (2026-09-01)
+
+- Adjusted the existing rate-limit middleware so health checks and read-only GET content requests do not consume the general mutation quota; login and refresh remain separately protected.
+- Added JSON 429 handlers for global and authentication limiters, and made the public fetch client normalize non-JSON platform responses into controlled application errors.
+- Admin session bootstrap now clears authentication only for definitive 401 responses; temporary 429, 5xx, network, or malformed responses no longer force logout.
+
+## Homepage Content Limits (2026-09-01)
+
+- Limited the homepage Lessons and Testimonials sections to six ordered records on tablet/desktop and three visible records on mobile.
+- Limited the homepage gallery to three published, active, featured records ordered by the existing display order; full listing pages remain unchanged.
+- Kept shared lesson/gallery service defaults unchanged for non-homepage consumers while passing homepage-specific limits explicitly.
+
+## About and Experience Page Settings (2026-09-01)
+
+- Added About and Experience Page tabs to Admin Website Settings using the existing settings API and JSON-backed structured content.
+- Public About and Experiences sections now consume settings with complete current-content fallbacks, including configurable copy, ordered collections, and image URLs while preserving existing layouts and routes.
+- Replaced the raw JSON textareas in both admin tabs with structured, human-friendly section forms, repeatable item controls, visibility/order fields, and image URL previews. Saved values continue to use the same JSON-backed settings contract.
+- Added matching Lesson Page and Event Page settings tabs. Lesson hero copy/CTAs/visual are editable; Event hero, info cards, featured-event presentation labels, and Past Event Memories are editable while product/event records remain API-sourced.
+- Fixed the post-save Admin Settings crash: backend validation/merge now preserves Lesson Page and Event Page groups, and the admin normalizes the save response before replacing local form state.
+- Added a Gallery Page settings tab for the existing gallery hero copy, CTAs, visual labels, and image URL while leaving gallery items, media, grid, and lightbox unchanged.

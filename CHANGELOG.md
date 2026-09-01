@@ -1,5 +1,32 @@
 # Changelog
 
+## 2026-09-01 - Demo Dataset Expansion
+
+- Expanded the existing Prisma seed to 10 lessons, 10 experiences with future availability slots, 10 fixed-schedule events, and 10 fictional coaches.
+- Added deterministic coach relationships without changing the database schema or removing existing records.
+- Fixed Event seed payload compatibility by removing the unsupported `displayOrder` field and audited all seeded fields against the Prisma schema.
+- Added 15 stable remote Unsplash gallery images using the existing Media/GalleryImage upsert mechanism.
+
+## 2026-09-01 - API Reliability Hardening
+
+- Prevented normal read-only CMS traffic and health checks from exhausting the general API limiter while retaining mutation and authentication protection.
+- Standardized limiter responses as JSON and hardened public/admin clients against non-JSON, 429, and temporary server failures without clearing valid admin sessions.
+
+## 2026-09-01 - Homepage Content Limits
+
+- Homepage Lessons and Testimonials now show up to six ordered records on larger screens and three on mobile.
+- Homepage gallery now requests only three published, active, featured images in display order.
+- Full Lessons and Gallery page consumers retain their existing service query sizes and ordering.
+
+## 2026-09-01 - About and Experience Page Settings
+
+- Added Admin Settings tabs for About and Experience Page content using the existing settings architecture.
+- Replaced hard-coded public page copy/collections/images with settings-backed values and safe defaults without changing visual structure.
+- Replaced raw JSON editing in Admin Settings with structured section forms, repeatable content controls, visibility/order inputs, and image previews while preserving the existing storage contract.
+- Added structured Lesson Page and Event Page settings, including Event hero cards and Past Event Memories, without duplicating lesson/event product data or changing public layouts.
+- Fixed settings save-state mismatch that dropped the new page groups from the backend response and crashed the active admin tab after saving.
+- Added settings-driven Gallery Page hero content and image fallback without changing gallery item/media behavior or public layout.
+
 ## 2026-09-01 - Booking Availability Shape Fix
 
 - Normalized booking availability defensively at the public booking API adapter so legacy/non-array Lesson/Event values cannot trigger runtime errors.

@@ -81,8 +81,11 @@ function mapItem(item: GalleryListResponse['data']['items'][number]): GalleryPub
   }
 }
 
-export async function fetchGalleryItems() {
-  const response = await safeFetch(`${API_BASE_URL}/gallery?quickFilter=published&status=active&page=1&pageSize=36&sortBy=createdAt&sortOrder=desc`, undefined, 'Unable to load the gallery. Please try again.')
+export async function fetchGalleryItems(options?: { featuredOnly?: boolean; pageSize?: number }) {
+  const featuredOnly = options?.featuredOnly === true
+  const pageSize = options?.pageSize || 36
+  const query = featuredOnly ? `quickFilter=featured&status=active&featured=true&page=1&pageSize=${pageSize}&sortBy=displayOrder&sortOrder=asc` : 'quickFilter=published&status=active&page=1&pageSize=36&sortBy=createdAt&sortOrder=desc'
+  const response = await safeFetch(`${API_BASE_URL}/gallery?${query}`, undefined, 'Unable to load the gallery. Please try again.')
   const json = (await response.json()) as GalleryListResponse
 
   if (!response.ok || !json.success) {

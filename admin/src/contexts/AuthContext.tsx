@@ -26,10 +26,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(result.user)
         setBootstrapError(null)
       } catch (error) {
-        clearAccessToken()
-        setUser(null)
-
         if (error instanceof ApiRequestError && error.statusCode === 401) {
+          clearAccessToken()
+          setUser(null)
           setBootstrapError(null)
         } else if (error instanceof Error) {
           setBootstrapError(error.message || 'Unable to restore your session. Please sign in again.')

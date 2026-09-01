@@ -25,7 +25,7 @@ export default function LessonsPreview() {
   useEffect(() => {
     let cancelled = false
 
-    fetchLessons()
+    fetchLessons(6)
       .then((items) => {
         if (!cancelled) {
           setLessons(items)
@@ -66,8 +66,8 @@ export default function LessonsPreview() {
           {loading ? <p className="text-sm text-[var(--color-text-secondary)]">Loading lessons...</p> : null}
           {error ? <p className="rounded-xl border border-rose-300/40 bg-rose-300/15 px-3 py-2 text-sm text-rose-100">{error}</p> : null}
           {!loading && !error && !lessons.length ? <p className="text-sm text-[var(--color-text-secondary)]">No lessons are available right now.</p> : null}
-          {!loading && !error && lessons.map((lesson, index) => (
-            <motion.div key={lesson.title} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.4, delay: index * 0.07 }} whileHover={{ y: -6, scale: 1.01 }}>
+          {!loading && !error && lessons.slice(0, 6).map((lesson, index) => (
+            <motion.div key={lesson.title} className={index >= 3 ? 'hidden sm:block' : undefined} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.4, delay: index * 0.07 }} whileHover={{ y: -6, scale: 1.01 }}>
               <Card variant="feature" className="h-full border-white/12 p-7">
                 <div className="h-28 overflow-hidden rounded-[1.25rem] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(122,214,209,0.2),transparent_45%),linear-gradient(135deg,rgba(4,19,27,0.95),rgba(23,52,71,0.8))]">
                   {lesson.coverImageUrl ? <img src={lesson.coverImageUrl} alt={lesson.title} className="h-full w-full object-cover" /> : null}

@@ -27,6 +27,11 @@ const linkSchema = z.object({
 })
 
 export const websiteSettingsBodySchema = z.object({
+  about: z.record(z.string(), z.unknown()).optional(),
+  experiencePage: z.record(z.string(), z.unknown()).optional(),
+  lessonPage: z.record(z.string(), z.unknown()).optional(),
+  eventPage: z.record(z.string(), z.unknown()).optional(),
+  galleryPage: z.record(z.string(), z.unknown()).optional(),
   general: z.object({
     websiteName: z.string().trim().min(1).max(120),
     tagline: z.string().trim().max(240).optional(),

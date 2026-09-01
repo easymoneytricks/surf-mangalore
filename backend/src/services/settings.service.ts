@@ -12,6 +12,11 @@ function mergeSettings(raw: unknown): WebsiteSettings {
   return {
     ...DEFAULT_WEBSITE_SETTINGS,
     ...next,
+    about: { ...DEFAULT_WEBSITE_SETTINGS.about, ...(next.about ?? {}) },
+    experiencePage: { ...DEFAULT_WEBSITE_SETTINGS.experiencePage, ...(next.experiencePage ?? {}) },
+    lessonPage: { ...DEFAULT_WEBSITE_SETTINGS.lessonPage, ...(next.lessonPage ?? {}) },
+    eventPage: { ...DEFAULT_WEBSITE_SETTINGS.eventPage, ...(next.eventPage ?? {}) },
+    galleryPage: { ...DEFAULT_WEBSITE_SETTINGS.galleryPage, ...(next.galleryPage ?? {}) },
     general: { ...DEFAULT_WEBSITE_SETTINGS.general, ...(next.general ?? {}) },
     homepage: { ...DEFAULT_WEBSITE_SETTINGS.homepage, ...(next.homepage ?? {}) },
     contact: { ...DEFAULT_WEBSITE_SETTINGS.contact, ...(next.contact ?? {}) },

@@ -71,6 +71,8 @@ export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T
   if (!response.ok || !json?.success) {
     const message = response.status === 401
       ? 'Your session has expired. Please sign in again.'
+      : response.status === 429
+        ? 'Too many requests. Please try again shortly.'
       : response.status === 403
         ? 'You do not have permission to perform this action.'
         : response.status >= 500

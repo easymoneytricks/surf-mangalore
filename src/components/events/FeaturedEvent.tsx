@@ -4,12 +4,15 @@ import Button from '../Button'
 import Card from '../Card'
 import type { EventPublicItem } from '../../services/events.service'
 import { navigateTo } from '../../utils/navigation'
+import { useWebsiteSettings } from '../../contexts/WebsiteSettingsContext'
 
 type FeaturedEventProps = {
   event: EventPublicItem
 }
 
 export default function FeaturedEvent({ event }: FeaturedEventProps) {
+  const { settings } = useWebsiteSettings()
+  const content = settings.eventPage.featured
   const bookingQuery = new URLSearchParams({
     bookingType: 'EVENT',
     selectedItemId: event.id,
@@ -22,7 +25,7 @@ export default function FeaturedEvent({ event }: FeaturedEventProps) {
       <div className="rounded-[2rem] border border-white/12 bg-[linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-8 shadow-[0_24px_80px_rgba(4,19,27,0.18)] sm:p-10 lg:p-12">
         <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div>
-            <Badge tone="accent">Featured event</Badge>
+            <Badge tone="accent">{content.badge}</Badge>
             <h2 className="mt-4 font-[var(--font-heading)] text-[clamp(1.9rem,3.4vw,2.7rem)] font-[var(--font-semibold)] leading-[1.06] tracking-[var(--letter-tight)] text-[var(--color-text)]">
               {event.title}
             </h2>
@@ -63,9 +66,9 @@ export default function FeaturedEvent({ event }: FeaturedEventProps) {
                   {event.category}
                 </div>
                 <div className="absolute bottom-5 left-5 right-5 rounded-[1.5rem] border border-white/12 bg-[rgba(4,19,27,0.6)] p-5 backdrop-blur-xl">
-                  <p className="text-[0.72rem] uppercase tracking-[0.3em] text-[var(--color-primary)]">Featured experience</p>
+                  <p className="text-[0.72rem] uppercase tracking-[0.3em] text-[var(--color-primary)]">{content.imageLabel}</p>
                   <p className="mt-2 text-sm leading-7 text-[var(--color-text-secondary)]">
-                    A community-focused surf event with an unmistakable premium feel and a strong sense of occasion.
+                    {content.imageDescription}
                   </p>
                 </div>
               </div>

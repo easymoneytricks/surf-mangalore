@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { settingsService } from '../../services/settings.service'
-import { type WebsiteSettings } from '../../types/settings'
+import { DEFAULT_WEBSITE_SETTINGS } from '../../constants/settings'
+import { type AboutSettings, type EventPageSettings, type ExperiencePageSettings, type GalleryPageSettings, type LessonPageSettings, type WebsiteSettings } from '../../types/settings'
+import { AboutSettingsForm, defaultAbout, defaultEventPage, defaultExperiencePage, defaultGalleryPage, defaultLessonPage, EventPageSettingsForm, ExperiencePageSettingsForm, GalleryPageSettingsForm, LessonPageSettingsForm } from './PageSettingsForm'
 
 type SettingsTab =
   | 'general'
@@ -13,6 +15,11 @@ type SettingsTab =
   | 'footer'
   | 'seo'
   | 'business'
+  | 'about'
+  | 'experiencePage'
+  | 'lessonPage'
+  | 'eventPage'
+  | 'galleryPage'
 
 const tabConfig: Array<{ key: SettingsTab; label: string }> = [
   { key: 'general', label: 'General' },
@@ -24,6 +31,11 @@ const tabConfig: Array<{ key: SettingsTab; label: string }> = [
   { key: 'seo', label: 'SEO' },
   { key: 'business', label: 'Business' },
   { key: 'navigation', label: 'Navigation' },
+  { key: 'about', label: 'About' },
+  { key: 'experiencePage', label: 'Experience Page' },
+  { key: 'lessonPage', label: 'Lesson Page' },
+  { key: 'eventPage', label: 'Event Page' },
+  { key: 'galleryPage', label: 'Gallery Page' },
 ]
 
 export default function WebsiteSettingsPage() {
@@ -40,7 +52,8 @@ export default function WebsiteSettingsPage() {
         setLoading(true)
         setError(null)
         const data = await settingsService.get()
-        setSettings(data)
+        const safeData = data && typeof data === 'object' ? data : DEFAULT_WEBSITE_SETTINGS
+        setSettings({ ...DEFAULT_WEBSITE_SETTINGS, ...safeData, about: normalizeAbout(safeData.about), experiencePage: normalizeExperiencePage(safeData.experiencePage), lessonPage: normalizeLessonPage(safeData.lessonPage), eventPage: normalizeEventPage(safeData.eventPage), galleryPage: normalizeGalleryPage(safeData.galleryPage) })
       } catch (loadError) {
         const message = loadError instanceof Error ? loadError.message : 'Failed to load settings'
         setError(message)
@@ -93,7 +106,14 @@ export default function WebsiteSettingsPage() {
       ['YouTube URL', settings.socialMedia.youtube],
       ['LinkedIn URL', settings.socialMedia.linkedIn],
       ['WhatsApp URL', settings.socialMedia.whatsapp],
-    ].filter(([, value]) => !isValidExternalUrl(value))
+      ['About hero image URL', settings.about.hero.imageUrl],
+      ['About story image URL', settings.about.story.imageUrl],
+      ['About why image URL', settings.about.why.imageUrl],
+      ['About community image URL', settings.about.community.imageUrl],
+      ['Experience hero image URL', settings.experiencePage.hero.imageUrl],
+      ['Experience equipment image URL', settings.experiencePage.equipment.imageUrl],
+      ...settings.experiencePage.support.items.map((item, index) => [`Experience support image URL ${index + 1}`, item.imageUrl] as [string, string]),
+    ].filter(([, value]) => !isValidExternalUrl(value) && !isValidImageUrl(value))
 
     if (invalidExternalFields.length) {
       setSuccess(null)
@@ -106,7 +126,8 @@ export default function WebsiteSettingsPage() {
       setError(null)
       setSuccess(null)
       const saved = await settingsService.update(settings)
-      setSettings(saved)
+      const safeSaved = saved && typeof saved === 'object' ? saved : settings
+      setSettings({ ...DEFAULT_WEBSITE_SETTINGS, ...safeSaved, about: normalizeAbout(safeSaved.about), experiencePage: normalizeExperiencePage(safeSaved.experiencePage), lessonPage: normalizeLessonPage(safeSaved.lessonPage), eventPage: normalizeEventPage(safeSaved.eventPage), galleryPage: normalizeGalleryPage(safeSaved.galleryPage) })
       setSuccess('Website settings saved successfully.')
     } catch (saveError) {
       const message = saveError instanceof Error ? saveError.message : 'Failed to save settings'
@@ -183,6 +204,12 @@ export default function WebsiteSettingsPage() {
           </label>
         </section>
       )}
+
+      {tab === 'about' && <AboutSettingsForm value={settings.about} onChange={(value) => update('about', value)} />}
+      {tab === 'experiencePage' && <ExperiencePageSettingsForm value={settings.experiencePage} onChange={(value) => update('experiencePage', value)} />}
+      {tab === 'lessonPage' && <LessonPageSettingsForm value={settings.lessonPage} onChange={(value) => update('lessonPage', value)} />}
+      {tab === 'eventPage' && <EventPageSettingsForm value={settings.eventPage} onChange={(value) => update('eventPage', value)} />}
+      {tab === 'galleryPage' && <GalleryPageSettingsForm value={settings.galleryPage} onChange={(value) => update('galleryPage', value)} />}
 
       {tab === 'contact' && (
         <section className="grid gap-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-6 md:grid-cols-2">
@@ -387,3 +414,22 @@ function isValidExternalUrl(value?: string) {
     return false
   }
 }
+
+function isValidImageUrl(value?: string) {
+  if (!value || !value.trim()) return true
+  return value.trim().startsWith('/') || value.trim().startsWith('data:image/')
+}
+
+function normalizeAbout(value: Partial<AboutSettings> | null | undefined): AboutSettings {
+  const raw = value || {}
+  return { ...defaultAbout, ...raw, hero: { ...defaultAbout.hero, ...(raw.hero || {}) }, story: { ...defaultAbout.story, ...(raw.story || {}) }, mission: { ...defaultAbout.mission, ...(raw.mission || {}) }, values: Array.isArray(raw.values) ? raw.values : defaultAbout.values, why: { ...defaultAbout.why, ...(raw.why || {}), points: Array.isArray(raw.why?.points) ? raw.why.points : defaultAbout.why.points }, safety: { ...defaultAbout.safety, ...(raw.safety || {}) }, timeline: { ...defaultAbout.timeline, ...(raw.timeline || {}), entries: Array.isArray(raw.timeline?.entries) ? raw.timeline.entries : defaultAbout.timeline.entries }, statistics: { ...defaultAbout.statistics, ...(raw.statistics || {}), items: Array.isArray(raw.statistics?.items) ? raw.statistics.items : defaultAbout.statistics.items }, community: { ...defaultAbout.community, ...(raw.community || {}) } }
+}
+
+function normalizeExperiencePage(value: Partial<ExperiencePageSettings> | null | undefined): ExperiencePageSettings {
+  const raw = value || {}
+  return { ...defaultExperiencePage, ...raw, hero: { ...defaultExperiencePage.hero, ...(raw.hero || {}) }, learning: { ...defaultExperiencePage.learning, ...(raw.learning || {}), items: Array.isArray(raw.learning?.items) ? raw.learning.items : defaultExperiencePage.learning.items }, support: { ...defaultExperiencePage.support, ...(raw.support || {}), items: Array.isArray(raw.support?.items) ? raw.support.items : defaultExperiencePage.support.items }, equipment: { ...defaultExperiencePage.equipment, ...(raw.equipment || {}), items: Array.isArray(raw.equipment?.items) ? raw.equipment.items : defaultExperiencePage.equipment.items } }
+}
+
+function normalizeLessonPage(value: Partial<LessonPageSettings> | null | undefined): LessonPageSettings { const raw = value || {}; return { ...defaultLessonPage, ...raw, hero: { ...defaultLessonPage.hero, ...(raw.hero || {}) } } }
+function normalizeEventPage(value: Partial<EventPageSettings> | null | undefined): EventPageSettings { const raw = value || {}; return { ...defaultEventPage, ...raw, hero: { ...defaultEventPage.hero, ...(raw.hero || {}) }, heroStats: Array.isArray(raw.heroStats) ? raw.heroStats : defaultEventPage.heroStats, featured: { ...defaultEventPage.featured, ...(raw.featured || {}) }, pastMemories: { ...defaultEventPage.pastMemories, ...(raw.pastMemories || {}), items: Array.isArray(raw.pastMemories?.items) ? raw.pastMemories.items : defaultEventPage.pastMemories.items } } }
+function normalizeGalleryPage(value: Partial<GalleryPageSettings> | null | undefined): GalleryPageSettings { const raw = value || {}; return { ...defaultGalleryPage, ...raw, hero: { ...defaultGalleryPage.hero, ...(raw.hero || {}) } } }

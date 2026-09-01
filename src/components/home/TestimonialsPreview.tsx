@@ -8,7 +8,7 @@ export default function TestimonialsPreview() {
   const [testimonials, setTestimonials] = useState<PublicTestimonial[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const displayItems = (loading ? Array.from({ length: 3 }) : testimonials) as Array<PublicTestimonial | undefined>
+  const displayItems = (loading ? Array.from({ length: 3 }) : testimonials.slice(0, 6)) as Array<PublicTestimonial | undefined>
 
   useEffect(() => {
     fetchPublicTestimonials()
@@ -39,7 +39,7 @@ export default function TestimonialsPreview() {
             }
 
             return (
-              <motion.div key={testimonial.authorName} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.4, delay: index * 0.07 }} whileHover={{ y: -6, scale: 1.01 }}>
+              <motion.div key={testimonial.authorName} className={index >= 3 ? 'hidden sm:block' : undefined} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.4, delay: index * 0.07 }} whileHover={{ y: -6, scale: 1.01 }}>
                 <Card variant="testimonial" className="h-full border-white/15 p-7">
                   <p className="text-[1.05rem] text-(--color-primary)">★★★★★</p>
                   <p className="mt-4 text-base leading-8 text-(--color-text-secondary)">“{testimonial.quote}”</p>

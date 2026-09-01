@@ -81,9 +81,9 @@ function normalizeNumber(value: number | string | null | undefined) {
   return Number.isNaN(normalized) ? undefined : normalized
 }
 
-export async function fetchLessons() {
+export async function fetchLessons(pageSize = 12) {
   const response = await safeFetch(
-    `${API_BASE_URL}/lessons?quickFilter=published&visibility=PUBLIC&page=1&pageSize=12&sortBy=displayOrder&sortOrder=desc`,
+    `${API_BASE_URL}/lessons?quickFilter=published&visibility=PUBLIC&page=1&pageSize=${pageSize}&sortBy=displayOrder&sortOrder=desc`,
     undefined,
     'Unable to load lessons. Please try again.',
   )

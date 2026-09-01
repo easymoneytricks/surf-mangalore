@@ -1,6 +1,11 @@
 import { type WebsiteSettings } from '../types/settings'
 
 export const DEFAULT_WEBSITE_SETTINGS: WebsiteSettings = {
+  about: {} as WebsiteSettings['about'],
+  experiencePage: {} as WebsiteSettings['experiencePage'],
+  lessonPage: {} as WebsiteSettings['lessonPage'],
+  eventPage: {} as WebsiteSettings['eventPage'],
+  galleryPage: {} as WebsiteSettings['galleryPage'],
   general: {
     websiteName: 'Surf Mangalore',
     tagline: 'Premium surf coaching and ocean-first experiences',
