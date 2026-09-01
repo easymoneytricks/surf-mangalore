@@ -26,6 +26,7 @@
 - Added structured Lesson Page and Event Page settings, including Event hero cards and Past Event Memories, without duplicating lesson/event product data or changing public layouts.
 - Fixed settings save-state mismatch that dropped the new page groups from the backend response and crashed the active admin tab after saving.
 - Added settings-driven Gallery Page hero content and image fallback without changing gallery item/media behavior or public layout.
+- Added public `/privacy` and `/terms` legal pages with booking-specific wording, SEO metadata, and footer navigation while preserving the existing visual system.
 
 ## 2026-09-01 - Booking Availability Shape Fix
 

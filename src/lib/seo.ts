@@ -147,6 +147,24 @@ export const seoPageEntries: PageSEOSeed[] = [
       { name: 'Contact', path: '/contact' },
     ],
   },
+  {
+    path: '/privacy',
+    title: 'Privacy Policy | Surf Mangalore',
+    description: 'Privacy information for Surf Mangalore website visitors and booking customers.',
+    keywords: ['Surf Mangalore privacy policy', 'surf booking privacy'],
+    imagePath: '/images/placeholders/ocean.svg',
+    includeOrganization: true,
+    breadcrumb: [{ name: 'Home', path: '/' }, { name: 'Privacy Policy', path: '/privacy' }],
+  },
+  {
+    path: '/terms',
+    title: 'Terms & Conditions | Surf Mangalore',
+    description: 'Terms governing Surf Mangalore lessons, experiences, events, bookings, and website use.',
+    keywords: ['Surf Mangalore terms', 'surf booking terms'],
+    imagePath: '/images/placeholders/ocean.svg',
+    includeOrganization: true,
+    breadcrumb: [{ name: 'Home', path: '/' }, { name: 'Terms & Conditions', path: '/terms' }],
+  },
 ]
 
 export function absoluteUrl(path: string) {

@@ -13,6 +13,7 @@ import ExperiencesPage from './pages/ExperiencesPage'
 import LessonDetailPage from './pages/LessonDetailPage'
 import LessonsPage from './pages/LessonsPage'
 import NotFound from './pages/NotFound'
+import LegalPage from './pages/LegalPage'
 
 const routeMap: Record<string, ReactNode> = {
   '/': <HomePage />,
@@ -23,6 +24,8 @@ const routeMap: Record<string, ReactNode> = {
   '/events': <EventsPage />,
   '/gallery': <GalleryPage />,
   '/contact': <ContactPage />,
+  '/privacy': <LegalPage kind="privacy" />,
+  '/terms': <LegalPage kind="terms" />,
 }
 
 export default function App() {

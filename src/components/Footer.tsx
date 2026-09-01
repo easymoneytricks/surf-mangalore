@@ -96,9 +96,9 @@ export default function Footer({ currentPath, navigate }: FooterProps) {
           <div className="flex flex-wrap items-center gap-4 text-sm text-(--color-text-secondary)">
             <p>{settings.footer.copyrightText}</p>
             <span className="hidden h-1 w-1 rounded-full bg-white/25 md:block" />
-            <span>{settings.footer.legalLinks[0]?.label || 'Privacy'}</span>
+            <button type="button" onClick={() => navigate('/privacy')} className="transition hover:text-(--color-text)">{settings.footer.legalLinks[0]?.label || 'Privacy'}</button>
             <span className="hidden h-1 w-1 rounded-full bg-white/25 md:block" />
-            <span>{settings.footer.legalLinks[1]?.label || 'Terms'}</span>
+            <button type="button" onClick={() => navigate('/terms')} className="transition hover:text-(--color-text)">{settings.footer.legalLinks[1]?.label || 'Terms'}</button>
           </div>
 
           <div className="flex flex-wrap gap-3">

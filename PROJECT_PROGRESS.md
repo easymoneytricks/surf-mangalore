@@ -473,3 +473,4 @@
 - Added matching Lesson Page and Event Page settings tabs. Lesson hero copy/CTAs/visual are editable; Event hero, info cards, featured-event presentation labels, and Past Event Memories are editable while product/event records remain API-sourced.
 - Fixed the post-save Admin Settings crash: backend validation/merge now preserves Lesson Page and Event Page groups, and the admin normalizes the save response before replacing local form state.
 - Added a Gallery Page settings tab for the existing gallery hero copy, CTAs, visual labels, and image URL while leaving gallery items, media, grid, and lightbox unchanged.
+- Added native public Privacy Policy and Terms & Conditions pages at `/privacy` and `/terms`; footer legal labels now navigate to these routes and contact details are read from Site Settings.
