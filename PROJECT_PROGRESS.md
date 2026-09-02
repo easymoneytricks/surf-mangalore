@@ -16,6 +16,7 @@
 - Fixed SMTP test-email delivery to read stored credentials through an internal-only settings path while keeping admin/public responses masked; public settings no longer expose SMTP host or username.
 - Refined booking-status email copy: completed bookings thank the customer, cancelled bookings apologise for the inconvenience, and Pay on Ground appears only for confirmed bookings.
 - Production deployment preparation completed: expanded repository ignore rules, audited tracked secret-like assignments, documented environment/database/Vercel procedures, and added FINAL_DEPLOYMENT_GUIDE.md. No Supabase data transfer or production migration was executed.
+- Added a tracked `.env.vercel.example` template containing production domains and non-secret defaults, with placeholders for all backend secrets and no seed password.
 
 - Home page implemented with premium storytelling sections and polished conversion flow.
 - Experiences page implemented with data-driven discovery, comparison, FAQ, and CTA structure.

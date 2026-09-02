@@ -29,6 +29,8 @@ temp/
 .env.*
 !.env.example
 !**/.env.example
+!.env.vercel.example
+!**/.env.vercel.example
 
 # Editor directories and files
 .vscode/*

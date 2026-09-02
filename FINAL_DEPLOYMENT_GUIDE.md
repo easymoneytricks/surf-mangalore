@@ -58,7 +58,11 @@ Inspect the existing Supabase schema and application records before importing an
 
 The local database is reachable at `localhost:5433`; Prisma reports all 5 committed migrations applied and the schema up to date. Non-secret application counts are: AdminUser 3, Role 9, Permission 76, RolePermission 286, Booking 10, ContactMessage 8, AuditLog 131, Lesson 11, Experience 15, Event 13, Coach 11, GalleryImage 25, Media 25, Testimonial 10, FAQ 16, SEOPage 4, and SiteSetting 1. Join tables and remaining CMS tables were also inspected. This is an inventory only; no production transfer has been performed.
 
-The ignored `backend/.env` contains local database endpoints. No Supabase comparison, backup, migration, or synchronization was executed because production credentials are not configured in this local environment. Perform those steps only in a secure production shell after inspecting for newer production records.
+The ignored `backend/.env` is currently configured with local runtime and Supabase migration endpoints. No production migration or synchronization was executed; production records must be preserved and any transfer performed only after backup and reviewed merge planning.
+
+### Supabase verification (2026-09-02 retry)
+
+The configured Supabase direct connection was reachable over SSL. Prisma reported all 5 migrations applied and the schema up to date. Supabase currently contains 8 bookings, 6 contact messages, 101 audit logs, 287 role-permission rows, and 58 sessions; the local authoritative database contains 10, 8, 131, 286, and 68 respectively. Content counts match for the inspected CMS tables, but the transactional differences mean production cannot be replaced by the local database without a reviewed merge. A `pg_dump` attempt timed out from this workstation, so no automatic Supabase backup was created.
 
 Backup example (run with `pg_dump` installed and a password supplied interactively or through a secure session):
 

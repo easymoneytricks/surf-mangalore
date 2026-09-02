@@ -11,6 +11,7 @@
 - Fixed SMTP test-email delivery using the stored password and removed all SMTP configuration details from the public settings response.
 - Updated booking-status email copy for completed and cancelled bookings; payment wording is now limited to confirmations.
 - Added final production deployment guide and strengthened repository exclusions for local databases, dumps, build artifacts, temporary files, and Vercel metadata.
+- Added a secret-safe `.env.vercel.example` template for the three existing Vercel projects.
 
 ## 2026-09-01 - Demo Dataset Expansion
 
