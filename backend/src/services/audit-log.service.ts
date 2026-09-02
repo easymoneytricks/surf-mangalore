@@ -93,9 +93,11 @@ export const auditLogService = {
     }
 
     if (query.from || query.to) {
+      const fromDate = query.from ? new Date(query.from) : undefined
+      const toDate = query.to ? new Date(query.to) : undefined
       where.createdAt = {
-        ...(query.from ? { gte: new Date(query.from) } : {}),
-        ...(query.to ? { lte: new Date(query.to) } : {}),
+        ...(fromDate && !Number.isNaN(fromDate.getTime()) ? { gte: fromDate } : {}),
+        ...(toDate && !Number.isNaN(toDate.getTime()) ? { lte: toDate } : {}),
       }
     }
 

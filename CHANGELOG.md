@@ -112,3 +112,7 @@
 - Created dashboard homepage with placeholder KPI cards and recent activity table for daily operational context.
 - Added route placeholders for all planned admin modules (Bookings, Lessons, Experiences, Events, Gallery, Coaches, Testimonials, FAQs, Media Library, Contact Messages, SEO, Settings, Users, Roles, Audit Logs).
 - Preserved no-feature policy for this sprint: no CRUD, no backend integration, no booking/event management logic.
+- 2026-09-01: Linked homepage experience previews to live detail routes, made booking support contact settings-driven, improved confirmation PDF presentation, protected SUPER_ADMIN accounts/role, and strengthened shared modal readability.
+- 2026-09-02: Corrected audit-log date filter contract and safe validation messaging; clarified actor input and permissions empty-state wording.
+- 2026-09-02: Standardized admin filter labels, updated Pages/dashboard/users/permissions wording, and added profile and provisioning-notes modal UX.
+- 2026-09-02: Added development-only safe Admin API diagnostics and removed duplicate Audit Logs pagination rendering.

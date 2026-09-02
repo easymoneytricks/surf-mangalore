@@ -69,6 +69,10 @@ export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T
   }
 
   if (!response.ok || !json?.success) {
+    const details = (json as { error?: { details?: { fieldErrors?: Record<string, string[]>; formErrors?: string[] } } } | null)?.error?.details
+    const fieldMessage = details?.fieldErrors
+      ? Object.values(details.fieldErrors).flat().find(Boolean)
+      : undefined
     const message = response.status === 401
       ? 'Your session has expired. Please sign in again.'
       : response.status === 429
@@ -77,7 +81,10 @@ export async function apiRequest<T>(path: string, init?: RequestInit): Promise<T
         ? 'You do not have permission to perform this action.'
         : response.status >= 500
           ? 'Something went wrong while processing your request.'
-          : (json?.message || 'Unable to complete the request. Please try again.')
+          : (fieldMessage || json?.message || 'Unable to complete the request. Please try again.')
+    if (import.meta.env.DEV) {
+      console.error('[Admin API]', { method: init?.method || 'GET', url: `${API_BASE_URL}${path}`, status: response.status, code: (json as { error?: { code?: string } } | null)?.error?.code, details })
+    }
     throw new ApiRequestError(message, response.status)
   }
 

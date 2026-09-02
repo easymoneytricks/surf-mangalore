@@ -5,7 +5,7 @@ import { GLOBAL_SEARCH_STATIC_ITEMS } from '../constants/global-search'
 import { useAdminApp } from '../contexts/AdminAppContext'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ui/ToastContext'
-import { Breadcrumbs, IconButton, SearchBar } from './admin'
+import { Breadcrumbs, IconButton, Modal, SearchBar, SecondaryButton } from './admin'
 
 type TopNavigationProps = {
   onToggleSidebar: () => void
@@ -25,11 +25,12 @@ export default function TopNavigation({ onToggleSidebar, onToggleCollapse, isCol
     markNotificationRead,
     markAllNotificationsRead,
   } = useAdminApp()
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
   const [searchTerm, setSearchTerm] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
 
   const searchResults = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -89,6 +90,7 @@ export default function TopNavigation({ onToggleSidebar, onToggleCollapse, isCol
               setSearchOpen(true)
             }}
             placeholder="Search"
+            showLabel={false}
           />
           {searchOpen ? (
             <div className="absolute right-0 top-12 z-[60] w-[26rem] max-w-[88vw] rounded-2xl border border-white/15 bg-[var(--color-surface)] p-2 shadow-xl">
@@ -195,13 +197,21 @@ export default function TopNavigation({ onToggleSidebar, onToggleCollapse, isCol
 
           {userMenuOpen ? (
             <div className="absolute right-0 top-11 z-[60] w-44 rounded-xl border border-white/15 bg-[var(--color-surface)] p-1.5 shadow-xl">
-              <button type="button" onClick={() => { pushToast('Profile view opened', 'info'); setUserMenuOpen(false) }} className="w-full rounded-lg px-3 py-2 text-left text-sm text-(--color-text) hover:bg-white/8">Profile</button>
+              <button type="button" onClick={() => { setProfileOpen(true); setUserMenuOpen(false) }} className="w-full rounded-lg px-3 py-2 text-left text-sm text-(--color-text) hover:bg-white/8">Profile</button>
               <button type="button" onClick={() => handleNavigate('/settings')} className="w-full rounded-lg px-3 py-2 text-left text-sm text-(--color-text) hover:bg-white/8">Settings</button>
               <button type="button" onClick={handleLogout} className="w-full rounded-lg px-3 py-2 text-left text-sm text-rose-200 hover:bg-rose-400/10">Logout</button>
             </div>
           ) : null}
         </div>
       </div>
+      <Modal isOpen={profileOpen} title="Admin Profile" onClose={() => setProfileOpen(false)} footer={<div className="flex justify-end"><SecondaryButton onClick={() => setProfileOpen(false)}>Close</SecondaryButton></div>}>
+        <div className="space-y-2 text-sm text-(--color-text-secondary)">
+          <p><span className="font-medium text-(--color-text)">Name:</span> {currentUser.name}</p>
+          <p><span className="font-medium text-(--color-text)">Email:</span> {currentUser.email}</p>
+          <p><span className="font-medium text-(--color-text)">Role:</span> {currentUser.role.replaceAll('_', ' ')}</p>
+          <p><span className="font-medium text-(--color-text)">Account status:</span> {user?.status || 'active'}</p>
+        </div>
+      </Modal>
     </header>
   )
 }

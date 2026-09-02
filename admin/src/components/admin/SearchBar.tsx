@@ -2,12 +2,13 @@ type SearchBarProps = {
   value: string
   placeholder?: string
   onChange: (value: string) => void
+  showLabel?: boolean
 }
 
-export default function SearchBar({ value, placeholder = 'Search...', onChange }: SearchBarProps) {
+export default function SearchBar({ value, placeholder = 'Search...', onChange, showLabel = true }: SearchBarProps) {
   return (
     <label className="relative block min-w-[14rem]">
-      <span className="sr-only">Search</span>
+      <span className={showLabel ? 'mb-1 block text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-(--color-text-secondary)' : 'sr-only'}>Search</span>
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}

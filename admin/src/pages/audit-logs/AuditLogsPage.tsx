@@ -50,6 +50,11 @@ function formatDateTime(value: string) {
   return new Date(value).toLocaleString()
 }
 
+function toAuditDateTime(value: string, endOfDay = false) {
+  if (!value) return undefined
+  return `${value}T${endOfDay ? '23:59:59.999' : '00:00:00.000'}Z`
+}
+
 export default function AuditLogsPage() {
   const [logs, setLogs] = useState<AuditLogRecord[]>([])
   const [search, setSearch] = useState('')
@@ -72,8 +77,8 @@ export default function AuditLogsPage() {
     action: action === 'all' ? undefined : action,
     resourceType: resourceType === 'all' ? undefined : resourceType,
     actorId: actorId.trim() ? Number(actorId) : undefined,
-    from: from || undefined,
-    to: to || undefined,
+    from: toAuditDateTime(from),
+    to: toAuditDateTime(to, true),
   }), [action, actorId, from, page, resourceType, search, to])
 
   const loadLogs = async () => {
@@ -111,7 +116,7 @@ export default function AuditLogsPage() {
           <SearchBar value={search} onChange={(value) => { setSearch(value); setPage(1) }} placeholder="Search action, resource, description, or actor" />
           <SelectInput label="Action" value={action} onChange={(value) => { setAction(value); setPage(1) }} options={ACTION_OPTIONS} />
           <SelectInput label="Resource" value={resourceType} onChange={(value) => { setResourceType(value); setPage(1) }} options={RESOURCE_OPTIONS} />
-          <TextInput label="Actor ID" value={actorId} onChange={(event) => { setActorId(event.target.value); setPage(1) }} />
+          <TextInput label="Actor ID" value={actorId} inputMode="numeric" onChange={(event) => { setActorId(event.target.value.replace(/\D/g, '')); setPage(1) }} />
           <TextInput label="From" type="date" value={from} onChange={(event) => { setFrom(event.target.value); setPage(1) }} />
           <TextInput label="To" type="date" value={to} onChange={(event) => { setTo(event.target.value); setPage(1) }} />
         </ActionToolbar>
@@ -125,6 +130,8 @@ export default function AuditLogsPage() {
         <>
           <GenericDataTable<AuditLogRecord>
             rows={logs}
+            showPagination={false}
+            pageSize={PAGE_SIZE}
             rowKey={(row) => String(row.id)}
             columns={[
               { key: 'actor', header: 'Actor', render: (row) => row.actor?.name || 'System' },

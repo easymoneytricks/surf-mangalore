@@ -144,6 +144,10 @@ export const rolesService = {
   async update(id: number, input: RoleUpdateInput, actorId?: number) {
     const existing = await ensureRole(id)
 
+    if (existing.isSystem && existing.slug === 'super-admin' && (input.status === 'inactive' || input.isSystem === false || input.name !== undefined && input.name !== existing.name)) {
+      throw new ApiError(HTTP_STATUS.FORBIDDEN, 'The SUPER_ADMIN role is protected')
+    }
+
     if (existing.isSystem && existing.slug === 'super-admin' && input.permissionIds) {
       throw new ApiError(HTTP_STATUS.FORBIDDEN, 'The SUPER_ADMIN role permissions are protected')
     }

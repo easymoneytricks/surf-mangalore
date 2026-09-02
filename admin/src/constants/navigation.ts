@@ -12,7 +12,7 @@ export const sidebarNavigation: SidebarNavItem[] = [
   { to: '/faqs', label: 'FAQs', permission: 'faqs.view' },
   { to: '/media-library', label: 'Media Library', permission: 'media.view' },
   { to: '/contact-messages', label: 'Contact Messages', permission: 'contact-messages.view' },
-  { to: '/seo', label: 'SEO', permission: 'seo.view' },
+  { to: '/seo', label: 'Pages', permission: 'seo.view' },
   { to: '/settings', label: 'Settings', permission: 'site-settings.view' },
   { to: '/users', label: 'Users', permission: 'users.view' },
   { to: '/roles', label: 'Roles', permission: 'roles.view' },

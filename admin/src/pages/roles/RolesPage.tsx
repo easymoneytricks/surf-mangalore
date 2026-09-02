@@ -44,6 +44,10 @@ function formatRoleType(isSystem: boolean) {
   return isSystem ? 'System' : 'Custom'
 }
 
+function isProtectedRole(role: Pick<AdminRoleRecord, 'isSystem' | 'slug'>) {
+  return role.isSystem && role.slug === 'super-admin'
+}
+
 function groupToPermissionIds(groups: AdminPermissionGroup[]) {
   return groups.flatMap((group) => group.permissions.map((permission) => permission.id))
 }
@@ -81,7 +85,7 @@ export default function RolesPage() {
       setError(null)
       const [rolesResult, permissionsResult] = await Promise.all([
         rolesService.list(query),
-        permissionsService.list({ page: 1, pageSize: 100 }),
+        permissionsService.list({ page: 1, pageSize: 50 }),
       ])
 
       setRoles(rolesResult.items)
@@ -281,9 +285,9 @@ export default function RolesPage() {
             <TextInput label="Role Name" value={editTarget.name || ''} onChange={(event) => setEditTarget({ ...editTarget, name: event.target.value })} />
             <TextInput label="Display Title" value={editTarget.title || ''} onChange={(event) => setEditTarget({ ...editTarget, title: event.target.value })} />
             <TextareaInput label="Description" value={editTarget.description || ''} onChange={(event) => setEditTarget({ ...editTarget, description: event.target.value })} />
-            <SelectInput label="Status" value={editTarget.status || 'active'} onChange={(value) => setEditTarget({ ...editTarget, status: value })} options={STATUS_OPTIONS.filter((option) => option.value !== 'all')} />
+            <SelectInput label="Status" value={editTarget.status || 'active'} onChange={(value) => setEditTarget({ ...editTarget, status: value })} options={STATUS_OPTIONS.filter((option) => option.value !== 'all')} disabled={Boolean(editTarget.id && editTarget.slug && isProtectedRole(editTarget as AdminRoleRecord))} />
             <label className="flex items-center gap-2 text-sm text-(--color-text-secondary)">
-              <input type="checkbox" checked={Boolean(editTarget.isSystem)} onChange={(event) => setEditTarget({ ...editTarget, isSystem: event.target.checked })} />
+              <input type="checkbox" checked={Boolean(editTarget.isSystem)} disabled={Boolean(editTarget.id && editTarget.slug && isProtectedRole(editTarget as AdminRoleRecord))} onChange={(event) => setEditTarget({ ...editTarget, isSystem: event.target.checked })} />
               System role
             </label>
 

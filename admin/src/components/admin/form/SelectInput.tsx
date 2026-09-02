@@ -12,14 +12,16 @@ type SelectInputProps = {
   onChange: (value: string) => void
   helpText?: string
   validationMessage?: string
+  disabled?: boolean
 }
 
-export default function SelectInput({ label, value, options, onChange, helpText, validationMessage }: SelectInputProps) {
+export default function SelectInput({ label, value, options, onChange, helpText, validationMessage, disabled }: SelectInputProps) {
   return (
     <FieldBase label={label} helpText={helpText} validationMessage={validationMessage}>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        disabled={disabled}
         className="h-10 w-full rounded-xl border border-white/15 bg-white/6 px-3 text-sm text-(--color-text)"
       >
         {options.map((option) => (

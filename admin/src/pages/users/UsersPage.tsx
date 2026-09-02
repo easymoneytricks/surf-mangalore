@@ -49,6 +49,10 @@ function formatLastLogin(value: string | null) {
   return new Date(value).toLocaleString()
 }
 
+function isProtectedUser(user: AdminUserRecord) {
+  return user.role === 'SUPER_ADMIN'
+}
+
 export default function UsersPage() {
   const { pushToast } = useToast()
   const [users, setUsers] = useState<AdminUserRecord[]>([])
@@ -63,6 +67,7 @@ export default function UsersPage() {
   const [viewTarget, setViewTarget] = useState<AdminUserRecord | null>(null)
   const [editTarget, setEditTarget] = useState<AdminUserRecord | null>(null)
   const [saving, setSaving] = useState(false)
+  const [provisioningOpen, setProvisioningOpen] = useState(false)
 
   const query = useMemo<AdminUsersListParams>(() => ({
     page,
@@ -164,16 +169,16 @@ export default function UsersPage() {
   return (
     <GenericListPage
       title="Users"
-      description="Manage admin users, lifecycle status, and role assignments across the CMS."
+      description="Manage admin users, roles, and account access."
       actions={(
         <div className="flex flex-wrap items-center gap-2">
           <SecondaryButton onClick={() => pushToast(`Export prepared for ${totalItems} users`, 'info')}>Export Users</SecondaryButton>
-          <PrimaryButton onClick={() => pushToast('Use the seed flow or direct database inserts to provision new users in this sprint.', 'info')}>Provisioning Notes</PrimaryButton>
+          <PrimaryButton onClick={() => setProvisioningOpen(true)}>Provisioning Notes</PrimaryButton>
         </div>
       )}
       filters={(
         <ActionToolbar>
-          <SearchBar value={search} onChange={(value) => { setSearch(value); setPage(1) }} placeholder="Search name or email" />
+          <SearchBar value={search} showLabel onChange={(value) => { setSearch(value); setPage(1) }} placeholder="Search name or email" />
           <SelectInput label="Role" value={role} onChange={(value) => { setRole(value); setPage(1) }} options={[{ label: 'All Roles', value: 'all' }, { label: 'Super Admin', value: 'SUPER_ADMIN' }, { label: 'Admin', value: 'ADMIN' }, { label: 'Editor', value: 'EDITOR' }, { label: 'Viewer', value: 'VIEWER' }]} />
           <SelectInput label="Status" value={status} onChange={(value) => { setStatus(value); setPage(1) }} options={[{ label: 'All Statuses', value: 'all' }, { label: 'Active', value: 'active' }, { label: 'Inactive', value: 'inactive' }]} />
         </ActionToolbar>
@@ -215,8 +220,8 @@ export default function UsersPage() {
             rowActions={(row) => (
               <div className="flex flex-wrap gap-1">
                 <SecondaryButton className="px-3 py-1 text-xs" onClick={() => void openView(row.id)}>View</SecondaryButton>
-                <SecondaryButton className="px-3 py-1 text-xs" onClick={() => void openEdit(row.id)}>Edit</SecondaryButton>
-                <SecondaryButton className="px-3 py-1 text-xs" onClick={() => void handleStatusToggle(row)}>
+                <SecondaryButton className="px-3 py-1 text-xs" onClick={() => void openEdit(row.id)} disabled={isProtectedUser(row)}>Edit</SecondaryButton>
+                <SecondaryButton className="px-3 py-1 text-xs" onClick={() => void handleStatusToggle(row)} disabled={isProtectedUser(row)}>
                   {row.status === 'active' ? 'Deactivate' : 'Activate'}
                 </SecondaryButton>
               </div>
@@ -245,6 +250,13 @@ export default function UsersPage() {
           </div>
         ) : null}
       </Modal>
+      <Modal isOpen={provisioningOpen} title="Provisioning Notes" onClose={() => setProvisioningOpen(false)} footer={<div className="flex justify-end"><SecondaryButton onClick={() => setProvisioningOpen(false)}>Close</SecondaryButton></div>}>
+        <div className="space-y-3 text-sm leading-6 text-(--color-text-secondary)">
+          <p>Admin users are provisioned through the existing development seed or approved direct database administration workflow.</p>
+          <p>The seed is idempotent and preserves existing records. Production user changes should continue through the established backend administration process.</p>
+          <p>No self-service provisioning flow is enabled in this panel.</p>
+        </div>
+      </Modal>
 
       <Modal
         isOpen={Boolean(editTarget)}
@@ -261,8 +273,8 @@ export default function UsersPage() {
           <div className="space-y-3">
             <TextInput label="Name" value={editTarget.name} onChange={(event) => setEditTarget({ ...editTarget, name: event.target.value })} />
             <TextInput label="Email" value={editTarget.email} onChange={(event) => setEditTarget({ ...editTarget, email: event.target.value })} />
-            <SelectInput label="Role" value={editTarget.role} onChange={(value) => setEditTarget({ ...editTarget, role: value as AdminUserRole })} options={[{ label: 'Super Admin', value: 'SUPER_ADMIN' }, { label: 'Admin', value: 'ADMIN' }, { label: 'Editor', value: 'EDITOR' }, { label: 'Viewer', value: 'VIEWER' }]} />
-            <SelectInput label="Status" value={editTarget.status} onChange={(value) => setEditTarget({ ...editTarget, status: value as AdminUserStatus })} options={[{ label: 'Active', value: 'active' }, { label: 'Inactive', value: 'inactive' }]} />
+            <SelectInput label="Role" value={editTarget.role} onChange={(value) => setEditTarget({ ...editTarget, role: value as AdminUserRole })} options={[{ label: 'Super Admin', value: 'SUPER_ADMIN' }, { label: 'Admin', value: 'ADMIN' }, { label: 'Editor', value: 'EDITOR' }, { label: 'Viewer', value: 'VIEWER' }]} disabled={isProtectedUser(editTarget)} />
+            <SelectInput label="Status" value={editTarget.status} onChange={(value) => setEditTarget({ ...editTarget, status: value as AdminUserStatus })} options={[{ label: 'Active', value: 'active' }, { label: 'Inactive', value: 'inactive' }]} disabled={isProtectedUser(editTarget)} />
             <TextInput label="Avatar URL" value={editTarget.avatar || ''} onChange={(event) => setEditTarget({ ...editTarget, avatar: event.target.value || null })} />
           </div>
         ) : null}

@@ -151,17 +151,14 @@ export const usersService = {
   async patch(id: number, input: UserPatchInput, actorId?: number) {
     const existing = await ensureUser(id)
 
+    if (existing.userRole === 'SUPER_ADMIN' && (input.status === 'inactive' || input.role !== undefined && input.role !== 'SUPER_ADMIN')) {
+      throw new ApiError(HTTP_STATUS.FORBIDDEN, 'The SUPER_ADMIN account is protected')
+    }
+
     if (input.email && input.email.toLowerCase() !== existing.email.toLowerCase()) {
       const emailOwner = await usersRepository.findByEmail(input.email)
       if (emailOwner && emailOwner.id !== id) {
         throw new ApiError(HTTP_STATUS.CONFLICT, 'Email is already in use')
-      }
-    }
-
-    if (input.status === 'inactive' && existing.userRole === 'SUPER_ADMIN') {
-      const superAdminCount = await countActiveSuperAdmins()
-      if (superAdminCount <= 1) {
-        throw new ApiError(HTTP_STATUS.CONFLICT, 'Cannot deactivate the last SUPER_ADMIN account')
       }
     }
 

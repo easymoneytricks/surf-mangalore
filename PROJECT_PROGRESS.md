@@ -477,3 +477,18 @@
 - Corrected homepage Upcoming Experiences to use published Experience records and their CMS cover images, with safe fallback imagery. About Community and Featured Event visuals now resolve configured/record images consistently without blank panels.
 - Completed Contact Page settings integration: hero copy/CTAs/image, location details, and Google Maps Embed URL are now settings-driven with safe fallbacks and iframe rendering for valid embed URLs.
 - Refined only the Admin login page into a focused two-column SurfMangalore gateway, removing fake metrics and implementation details while preserving authentication behavior.
+
+## Booking/Admin Reliability and Safety (2026-09-01)
+
+- Homepage upcoming experience cards now navigate to their live slugs with keyboard support.
+- Booking confirmations use the configured Website Settings support phone and branded structured PDF output.
+- Protected SUPER_ADMIN users and the system role from destructive status, role, or deletion operations in UI and API.
+- Shared admin modals now use an opaque readable panel over a darkened backdrop.
+
+## Admin Access and Audit Filters (2026-09-02)
+
+- Audit date filters now submit UTC start/end-of-day datetimes matching backend validation, with clear Admin User ID labeling.
+- Admin API validation details are surfaced as safe field messages; Permissions empty state no longer references seeding.
+- Admin filter SearchBar controls now expose consistent visible SEARCH labels while the global header search remains unchanged.
+- Updated Admin wording for Pages, dashboard, users, and permissions; added read-only profile and provisioning-notes modals.
+- Admin API development requests now log method, URL, status, safe error code, and validation details; audit table uses API pagination as the sole visible paginator.

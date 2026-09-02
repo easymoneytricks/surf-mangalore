@@ -20,7 +20,7 @@ export const GLOBAL_SEARCH_STATIC_ITEMS: GlobalSearchItem[] = [
   { id: 'gs-roles', title: 'Roles', subtitle: 'Role definitions and cloning', path: '/roles', keywords: ['permissions', 'members', 'role'] },
   { id: 'gs-permissions', title: 'Permissions', subtitle: 'Permission matrix controls', path: '/permissions', keywords: ['matrix', 'groups', 'toggle'] },
   { id: 'gs-settings', title: 'Settings', subtitle: 'Global website configuration', path: '/settings', keywords: ['general', 'branding', 'seo', 'footer'] },
-  { id: 'gs-seo', title: 'SEO Manager', subtitle: 'Metadata and robots directives', path: '/seo', keywords: ['meta', 'og', 'twitter', 'canonical'] },
+  { id: 'gs-seo', title: 'Pages', subtitle: 'Website page metadata and indexing', path: '/seo', keywords: ['meta', 'og', 'twitter', 'canonical'] },
   { id: 'gs-contact', title: 'Contact Messages', subtitle: 'Inbox workflow', path: '/contact-messages', keywords: ['inbox', 'unread', 'reply'] },
   { id: 'gs-audit', title: 'Audit Logs', subtitle: 'Action trail and severity timeline', path: '/audit-logs', keywords: ['timeline', 'activity', 'ip'] },
 ]

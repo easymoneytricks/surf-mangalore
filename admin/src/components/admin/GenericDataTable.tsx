@@ -22,6 +22,7 @@ type GenericDataTableProps<T> = {
   onSelectionChange?: (selectedIds: string[]) => void
   rowActions?: (row: T) => ReactNode
   serverPaginationHint?: string
+  showPagination?: boolean
 }
 
 export default function GenericDataTable<T>({
@@ -35,6 +36,7 @@ export default function GenericDataTable<T>({
   onSelectionChange,
   rowActions,
   serverPaginationHint,
+  showPagination = true,
 }: GenericDataTableProps<T>) {
   const [sortBy, setSortBy] = useState<string | null>(null)
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
@@ -143,7 +145,7 @@ export default function GenericDataTable<T>({
         </table>
       </div>
 
-      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+      {showPagination ? <Pagination page={page} totalPages={totalPages} onPageChange={setPage} /> : null}
       {serverPaginationHint ? <p className="mt-2 text-xs text-(--color-text-secondary)">{serverPaginationHint}</p> : null}
     </div>
   )

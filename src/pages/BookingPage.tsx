@@ -13,6 +13,7 @@ import Card from '../components/Card'
 import { bookingParticipantConfig, bookingStepsForType } from '../data/bookingOptions'
 import { createBooking, fetchBookableOptions } from '../services/bookings.service'
 import type { BookingCreatePayload, BookingFieldError, BookingFormData, BookingSelectableItem, BookingStep, PublicBookingType } from '../types/booking'
+import { useWebsiteSettings } from '../contexts/WebsiteSettingsContext'
 
 const STORAGE_KEY = 'surfmangalore.booking.draft'
 
@@ -46,6 +47,7 @@ function parseBookingType(value: string | null): PublicBookingType | '' {
 }
 
 export default function BookingPage() {
+  const { settings } = useWebsiteSettings()
   const [formData, setFormData] = useState<BookingFormData>(initialFormData)
   const [currentStep, setCurrentStep] = useState<Exclude<BookingStep, 'success'>>('offering')
   const [fieldErrors, setFieldErrors] = useState<BookingFieldError>({})
@@ -311,7 +313,7 @@ export default function BookingPage() {
           participants: result.participants,
           location: result.location || 'Surf Mangalore venue details will be shared by support',
           paymentNotice: result.paymentNotice || 'Pay at venue on arrival.',
-          support: import.meta.env.VITE_SUPPORT_WHATSAPP || import.meta.env.VITE_PUBLIC_PHONE || '+91 00000 00000',
+          support: settings.contact.supportPhone || settings.general.primaryPhone || '',
           bookingType: result.bookingType,
         })
         setIsSubmitted(true)

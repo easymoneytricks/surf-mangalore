@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Badge from '../Badge'
 import Card from '../Card'
 import { fetchExperiences, type ExperiencePublicModel } from '../../services/experiences.service'
+import { navigateTo } from '../../utils/navigation'
 
 export default function EventsPreview() {
   const [events, setEvents] = useState<ExperiencePublicModel[]>([])
@@ -60,7 +61,7 @@ export default function EventsPreview() {
             <p className="text-sm text-[var(--color-text-secondary)]">No upcoming experiences are available at the moment.</p>
           ) : (
             previewItems.map((event, index) => (
-              <motion.div key={event.title} initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.4, delay: index * 0.07 }} whileHover={{ y: -6, scale: 1.01 }}>
+              <motion.div key={event.title} role="button" tabIndex={0} onClick={() => navigateTo(`/experiences/${event.slug}`)} onKeyDown={(keyboardEvent) => { if (keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ') { keyboardEvent.preventDefault(); navigateTo(`/experiences/${event.slug}`) } }} className="cursor-pointer rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]" initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.4, delay: index * 0.07 }} whileHover={{ y: -6, scale: 1.01 }}>
                 <Card variant="feature" className="h-full border-white/12 p-7">
                   <div className={`h-24 rounded-[1.15rem] border border-white/10 ${event.imageClassName}`} role="img" aria-label={event.imageLabel} />
                   <div className="mt-5 text-[0.72rem] uppercase tracking-[0.3em] text-[var(--color-primary)]">{event.imageLabel}</div>

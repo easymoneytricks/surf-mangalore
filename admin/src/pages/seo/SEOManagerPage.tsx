@@ -107,23 +107,6 @@ export default function SEOManagerPage() {
     })
   }, [selectedEntry])
 
-  const applySuggestions = () => {
-    if (!editor.metaDescription) {
-      return
-    }
-
-    const nextDescription = editor.metaDescription.length > 150
-      ? editor.metaDescription.slice(0, 150)
-      : `${editor.metaDescription} Book now.`
-
-    setEditor((prev) => ({
-      ...prev,
-      metaTitle: prev.metaTitle || `${prev.name} | Surf Mangalore`,
-      metaDescription: nextDescription,
-    }))
-    pushToast('SEO suggestions applied', 'info')
-  }
-
   const saveSelected = async () => {
     if (!selectedEntry) {
       return
@@ -182,13 +165,12 @@ export default function SEOManagerPage() {
 
   return (
     <GenericListPage
-      title="SEO Manager"
-      description="Manage meta title, meta description, slug, canonical, Open Graph, Twitter card, and robots directives."
+      title="Pages"
+      description="Manage website pages, search metadata, social sharing details, and indexing settings."
       actions={(
         <div className="flex flex-wrap items-center gap-2">
-          <SecondaryButton onClick={applySuggestions}>Generate Suggestions</SecondaryButton>
           <SecondaryButton onClick={loadEntries}>Refresh</SecondaryButton>
-          <PrimaryButton onClick={createEntry}>Create SEO Entry</PrimaryButton>
+          <PrimaryButton onClick={createEntry}>Create New Page</PrimaryButton>
         </div>
       )}
       filters={(

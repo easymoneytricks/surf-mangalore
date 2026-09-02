@@ -76,8 +76,8 @@ export default function DashboardPage() {
 
   return (
     <GenericListPage
-      title="CMS Dashboard"
-      description="Production analytics backed by bookings, events, contacts, and audit logs."
+      title="Admin Dashboard"
+      description="Overview of bookings, events, website activity, and recent admin updates."
       filters={(
         <ActionToolbar>
           <SelectInput label="Range" value={range} onChange={(value) => setRange(value as DashboardRange)} options={RANGE_OPTIONS} />

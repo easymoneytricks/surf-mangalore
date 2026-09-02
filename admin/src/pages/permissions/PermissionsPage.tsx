@@ -49,8 +49,8 @@ export default function PermissionsPage() {
       setLoading(true)
       setError(null)
       const [permissionsResult, rolesResult] = await Promise.all([
-        permissionsService.list({ page: 1, pageSize: 100 }),
-        rolesService.list({ page: 1, pageSize: 100 }),
+        permissionsService.list({ page: 1, pageSize: 50 }),
+        rolesService.list({ page: 1, pageSize: 50 }),
       ])
 
       setGroups(permissionsResult.grouped)
@@ -125,7 +125,7 @@ export default function PermissionsPage() {
   return (
     <GenericListPage
       title="Permissions"
-      description="Review grouped permissions and assign them to roles using the live database matrix."
+      description="Manage permissions and assign access to admin roles."
       actions={(
         <div className="flex flex-wrap items-center gap-2">
           <SecondaryButton onClick={() => void loadData()}>Refresh</SecondaryButton>
@@ -161,7 +161,7 @@ export default function PermissionsPage() {
     >
       {error ? <p className="rounded-xl border border-rose-300/40 bg-rose-300/12 px-3 py-2 text-sm text-rose-200">{error}</p> : null}
       {loading ? <LoadingState mode="table" /> : null}
-      {!loading && !filteredGroups.length ? <EmptyState title="No permissions found" description="Try adjusting filters or seed the access-control catalog." /> : null}
+      {!loading && !filteredGroups.length ? <EmptyState title="No permissions found" description="No permissions are available yet." /> : null}
 
       {!loading && filteredGroups.length ? (
         <>
