@@ -1,5 +1,6 @@
 import { createBaseContentController } from '../content-engine'
 import { contactMessageService } from '../services/contact-message.service'
+import { settingsService } from '../services/settings.service'
 import { type ContactMessageListQuery } from '../types/contact-message'
 
 const baseContactMessageController = createBaseContentController({
@@ -15,3 +16,12 @@ export const getContactMessageByIdController = baseContactMessageController.getB
 export const createContactMessageController = baseContactMessageController.create
 export const updateContactMessageController = baseContactMessageController.update
 export const deleteContactMessageController = baseContactMessageController.remove
+
+export function getContactRecaptchaController(_req: any, res: any) {
+  return settingsService.getWebsiteSettings(false).then((settings) => res.status(200).json({ success: true, data: { enabled: Boolean(settings.security?.recaptchaEnabled), siteKey: settings.security?.recaptchaSiteKey || null } }))
+}
+
+export async function replyToContactMessageController(req: any, res: any) {
+  const result = await contactMessageService.reply(Number(req.params.id), req.body)
+  return res.status(200).json({ success: true, message: 'Reply sent successfully', data: result })
+}

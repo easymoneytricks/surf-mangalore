@@ -2,6 +2,18 @@
 
 ## Completed Public Pages
 
+## Contact Messaging Reliability (September 2026)
+
+- Added server-side CAPTCHA configuration hooks and safe public site-key metadata for the contact endpoint.
+- Added reusable SMTP email delivery service for admin enquiry notifications and customer replies; delivery failures do not remove saved enquiries.
+- Replaced the admin mailto/draft reply action with a permission-protected server reply endpoint and `Send Reply` workflow.
+- Removed the manual Mark as replied action; successful replies transition the existing RESOLVED status to the admin-facing REPLIED state.
+- Added protected Settings → Security and Settings → Email panels for reCAPTCHA and SMTP configuration. Secret values are masked and blank updates preserve stored credentials.
+- Added a permission-protected SMTP test-email endpoint and admin action.
+- Added branded customer booking-status emails for CONFIRMED, COMPLETED, and CANCELLED transitions. Emails are sent after the status update and include the booking reference, product, schedule, participants, pricing, and pay-on-ground notice.
+- Fixed Contact Messages status persistence by removing the invalid generic `updatedBy` relation payload; Mark as read, Archive, and Restore now update successfully. Inbox rows now have clearer vertical spacing.
+- Pre-deployment security review completed: production JWT/origin/cookie safeguards, Helmet, CORS allowlist, auth throttling, secret redaction, and public settings secret stripping verified. Settings update responses were corrected to remain secret-safe.
+
 - Home page implemented with premium storytelling sections and polished conversion flow.
 - Experiences page implemented with data-driven discovery, comparison, FAQ, and CTA structure.
 - Events page implemented with featured event, upcoming grid, highlights, and social proof sections.

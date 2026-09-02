@@ -52,4 +52,11 @@ export const contactMessagesService = {
       method: 'DELETE',
     })
   },
+
+  reply(id: number, payload: { message: string; subject?: string }) {
+    return apiRequest<ContactMessageEntity>(`/contact-messages/${id}/reply`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  },
 }

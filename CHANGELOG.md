@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-02 - Contact Message Status Fix
+
+- Fixed Mark as read, Archive, and Restore failures caused by an invalid `updatedBy` relation payload on ContactMessage updates.
+- Added vertical spacing between inbox message rows.
+
+## 2026-09-02 - Pre-deployment Security Review
+
+- Prevented SMTP and reCAPTCHA secrets from being returned in settings update responses.
+
 ## 2026-09-01 - Demo Dataset Expansion
 
 - Expanded the existing Prisma seed to 10 lessons, 10 experiences with future availability slots, 10 fixed-schedule events, and 10 fictional coaches.
@@ -118,3 +127,10 @@
 - 2026-09-02: Added development-only safe Admin API diagnostics and removed duplicate Audit Logs pagination rendering.
 - 2026-09-02: Removed implicit GenericDataTable pagination so paginated admin modules use one API-backed pagination control each.
 - 2026-09-02: Added secure profile password change and Super Admin-only admin password reset flows without exposing password data.
+# Unreleased
+
+- Contact messages: added SMTP-backed admin notifications and customer replies, server-side reCAPTCHA verification hooks, and safe reply delivery handling.
+- Admin contact inbox: removed manual “Mark as replied” and wired “Send Reply” through the backend so status changes only after delivery succeeds.
+- Admin Settings now includes Security (reCAPTCHA) and Email (SMTP) configuration with secret-safe admin/public responses.
+- Added “Send Test Email” to the Email settings panel.
+- Booking status changes to Confirmed, Completed, or Cancelled now trigger branded customer emails through configured SMTP.

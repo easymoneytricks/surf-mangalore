@@ -8,7 +8,7 @@ const SETTINGS_STORAGE_KEY = 'admin_website_settings_v1'
 export const settingsService = {
   async get() {
     try {
-      const remote = await apiRequest<WebsiteSettings>('/settings')
+      const remote = await apiRequest<WebsiteSettings>('/settings/admin')
       writeStorage(SETTINGS_STORAGE_KEY, remote)
       return remote
     } catch {
@@ -29,5 +29,8 @@ export const settingsService = {
 
     writeStorage(SETTINGS_STORAGE_KEY, remote)
     return remote
+  },
+  async sendTestEmail(to: string) {
+    return apiRequest<{ sent: boolean }>('/settings/admin/test-email', { method: 'POST', body: JSON.stringify({ to }) })
   },
 }

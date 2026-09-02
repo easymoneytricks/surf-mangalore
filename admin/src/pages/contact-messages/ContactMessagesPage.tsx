@@ -106,20 +106,12 @@ export default function ContactMessagesPage() {
     pushToast('Message marked as read', 'success')
   }
 
-  const handleMarkReplied = async (message: MessageItem) => {
-    await updateMessageStatus(message.id, 'REPLIED')
-    pushToast('Message marked as replied', 'success')
-  }
-
   const handleRestore = async (message: MessageItem) => {
     await updateMessageStatus(message.id, 'READ')
     pushToast('Message restored from archive', 'success')
   }
 
   const openReply = (message: MessageItem) => {
-    const subject = encodeURIComponent(message.subject || `Re: ${message.name}`)
-    const body = encodeURIComponent(`Hi ${message.name.split(' ')[0]},\n\nThanks for reaching out to Surf Mangalore.\n\n`)
-    window.open(`mailto:${message.email}?subject=${subject}&body=${body}`, '_blank', 'noopener,noreferrer')
     setReplyTarget(message)
     setReplyBody(`Hi ${message.name.split(' ')[0]},\n\nThanks for reaching out to Surf Mangalore.\n\n`)
 
@@ -133,9 +125,9 @@ export default function ContactMessagesPage() {
       return
     }
 
-    pushToast(`Reply opened for ${replyTarget.name}`, 'info')
-    setReplyTarget(null)
-    setReplyBody('')
+    void contactMessagesService.reply(replyTarget.id, { message: replyBody, subject: replyTarget.subject || undefined })
+      .then(() => { pushToast('Reply sent successfully', 'success'); setReplyTarget(null); setReplyBody(''); void loadMessages() })
+      .catch((error: unknown) => pushToast((error as Error).message || 'Unable to send reply', 'danger'))
   }
 
   const createTemplate = () => {
@@ -182,7 +174,7 @@ export default function ContactMessagesPage() {
         <section className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
           <article className="admin-card rounded-2xl border border-white/10 p-3">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-[0.12em] text-(--color-text-secondary)">Inbox</h3>
-            <div className="space-y-2">
+            <div className="flex flex-col gap-4">
               {rows.map((message) => {
                 const isActive = selected?.id === message.id
                 return (
@@ -230,7 +222,6 @@ export default function ContactMessagesPage() {
                 <div className="mt-4 flex flex-wrap gap-2">
                   <PrimaryButton onClick={() => openReply(selected)}>Reply</PrimaryButton>
                   <SecondaryButton onClick={() => handleMarkRead(selected)}>Mark as read</SecondaryButton>
-                  <SecondaryButton onClick={() => handleMarkReplied(selected)}>Mark as replied</SecondaryButton>
                   {selected.status === 'ARCHIVED' ? <SecondaryButton onClick={() => handleRestore(selected)}>Restore</SecondaryButton> : <SecondaryButton onClick={() => setArchiveTarget(selected)}>Archive</SecondaryButton>}
                   <SecondaryButton onClick={() => setDeleteTarget(selected)}>Delete</SecondaryButton>
                 </div>
@@ -286,7 +277,7 @@ export default function ContactMessagesPage() {
         footer={(
           <div className="flex justify-end gap-2">
             <SecondaryButton onClick={() => setReplyTarget(null)}>Cancel</SecondaryButton>
-            <PrimaryButton onClick={submitReply}>Send Draft Reply</PrimaryButton>
+            <PrimaryButton onClick={submitReply} disabled={!replyBody.trim()}>Send Reply</PrimaryButton>
           </div>
         )}
       >

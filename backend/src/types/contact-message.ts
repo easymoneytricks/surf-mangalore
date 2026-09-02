@@ -23,6 +23,7 @@ export type ContactMessageCreateInput = {
   subject?: string
   message: string
   source?: string
+  captchaToken?: string
 }
 
 export type ContactMessageUpdateInput = {
@@ -33,3 +34,5 @@ export type ContactMessageUpdateInput = {
   email?: string
   phone?: string
 }
+
+export type ContactMessageReplyInput = { message: string; subject?: string }

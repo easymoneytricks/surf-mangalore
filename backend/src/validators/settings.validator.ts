@@ -27,6 +27,8 @@ const linkSchema = z.object({
 })
 
 export const websiteSettingsBodySchema = z.object({
+  security: z.object({ recaptchaEnabled: z.boolean(), recaptchaSiteKey: z.string().max(300), recaptchaSecretKey: z.string().max(500).optional() }).optional(),
+  email: z.object({ enabled: z.boolean(), smtpHost: z.string().max(200), smtpPort: z.coerce.number().int().positive().max(65535), smtpSecurity: z.enum(['none', 'starttls', 'ssl']), smtpUsername: z.string().max(200), smtpPassword: z.string().max(500).optional(), fromName: z.string().max(160), fromEmail: z.string().email().or(z.literal('')), adminNotificationEmail: z.string().email().or(z.literal('')), replyToEmail: z.string().email().or(z.literal('')) }).optional(),
   about: z.record(z.string(), z.unknown()).optional(),
   experiencePage: z.record(z.string(), z.unknown()).optional(),
   lessonPage: z.record(z.string(), z.unknown()).optional(),

@@ -19,6 +19,7 @@ const contactMessageCreateBodySchema = z.object({
   subject: z.string().trim().max(220).optional(),
   message: z.string().trim().min(10).max(5000),
   source: z.string().trim().max(120).optional(),
+  captchaToken: z.string().trim().min(1).optional(),
 })
 
 const contactMessageUpdateBodySchema = z.object({
@@ -33,4 +34,9 @@ const contactMessageUpdateBodySchema = z.object({
 export const contactMessageCreateBody = contactMessageCreateBodySchema
 export const contactMessageUpdateBody = contactMessageUpdateBodySchema.partial().refine((value) => Object.keys(value).length > 0, {
   message: 'At least one field must be provided for update',
+})
+
+export const contactMessageReplyBody = z.object({
+  message: z.string().trim().min(1).max(5000),
+  subject: z.string().trim().max(220).optional(),
 })

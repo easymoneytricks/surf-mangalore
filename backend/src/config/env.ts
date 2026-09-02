@@ -80,6 +80,18 @@ const envSchema = z.object({
   CLOUDINARY_API_SECRET: z.string().optional(),
   CLOUDINARY_FOLDER_PREFIX: z.string().default('surfmangalore/cms'),
   SEED_ADMIN_PASSWORD: z.string().min(16).optional(),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  SMTP_SECURE: z.string().optional().transform((value) => value === 'true'),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASSWORD: z.string().optional(),
+  SMTP_FROM_NAME: z.string().optional(),
+  SMTP_FROM_EMAIL: z.string().email().optional(),
+  SMTP_ADMIN_EMAIL: z.string().email().optional(),
+  SMTP_REPLY_TO: z.string().email().optional(),
+  RECAPTCHA_ENABLED: z.string().optional().transform((value) => value === 'true'),
+  RECAPTCHA_SITE_KEY: z.string().optional(),
+  RECAPTCHA_SECRET_KEY: z.string().optional(),
   MEDIA_ENABLE_AV_SCANNING: z
     .string()
     .optional()

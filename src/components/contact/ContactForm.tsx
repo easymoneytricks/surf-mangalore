@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { type FormEvent } from 'react'
 import { motion } from 'framer-motion'
 import Badge from '../Badge'
 import Button from '../Button'
 import Card from '../Card'
-import { sendContactMessage } from '../../services/contact.service'
+import { getContactRecaptchaConfig, sendContactMessage } from '../../services/contact.service'
 
 type ContactFormValues = {
   name: string
@@ -38,6 +38,23 @@ export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [captcha, setCaptcha] = useState<{ enabled: boolean; siteKey: string | null }>({ enabled: false, siteKey: null })
+  const [captchaToken, setCaptchaToken] = useState('')
+  const captchaRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => { void getContactRecaptchaConfig().then(setCaptcha).catch(() => undefined) }, [])
+  useEffect(() => {
+    if (!captcha.enabled || !captcha.siteKey || !captchaRef.current) return
+    const render = () => {
+      const grecaptcha = (window as any).grecaptcha
+      if (grecaptcha && captchaRef.current && !captchaRef.current.dataset.rendered) {
+        grecaptcha.render(captchaRef.current, { sitekey: captcha.siteKey, callback: (token: string) => setCaptchaToken(token), 'expired-callback': () => setCaptchaToken('') })
+        captchaRef.current.dataset.rendered = 'true'
+      }
+    }
+    if ((window as any).grecaptcha) render()
+    else { const script = document.createElement('script'); script.src = 'https://www.google.com/recaptcha/api.js?render=explicit'; script.async = true; script.onload = render; document.head.appendChild(script) }
+  }, [captcha])
 
   const setField = (field: keyof ContactFormValues, value: string) => {
     setValues((previous) => ({ ...previous, [field]: value }))
@@ -73,6 +90,7 @@ export default function ContactForm() {
         subject: values.subject.trim(),
         message: values.message.trim(),
         source: 'Website contact form',
+        captchaToken: captchaToken || undefined,
       })
 
       setSubmitted(true)
@@ -139,6 +157,8 @@ export default function ContactForm() {
               </label>
 
               {submitError ? <p className="col-span-2 rounded-xl border border-rose-300/40 bg-rose-300/15 px-4 py-3 text-sm text-rose-100">{submitError}</p> : null}
+
+              {captcha.enabled ? <div ref={captchaRef} className="md:col-span-2" aria-label="Security verification" /> : null}
 
               <div className="md:col-span-2">
                 <Button variant="primary" size="lg" className="w-full sm:w-auto" type="submit" disabled={isSubmitting}>

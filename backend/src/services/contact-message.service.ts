@@ -7,11 +7,12 @@ import {
   buildSearchOrClause,
   buildSorting,
   mergeWhereClauses,
-  withUpdateAudit,
 } from '../content-engine'
 import { contactMessageRepository } from '../repositories/contact-message.repository'
 import { ApiError } from '../utils/api-error'
 import { type ContactMessageListQuery, type ContactMessageCreateInput, type ContactMessageUpdateInput } from '../types/contact-message'
+import { sendAdminContactNotification, sendContactReply } from './email.service'
+import { settingsService } from './settings.service'
 
 type ContactMessageListRecord = Awaited<ReturnType<typeof contactMessageRepository.listRaw>>['items'][number]
 type ContactMessageDetailRecord = NonNullable<Awaited<ReturnType<typeof contactMessageRepository.findById>>>
@@ -136,6 +137,13 @@ export const contactMessageService = {
   },
 
   async create(input: ContactMessageCreateInput) {
+    const security = (await settingsService.getWebsiteSettings(true)).security
+    if (security.recaptchaEnabled) {
+      if (!input.captchaToken || !security.recaptchaSecretKey) throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Please complete the CAPTCHA verification.')
+      const verification = await fetch('https://www.google.com/recaptcha/api/siteverify', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ secret: security.recaptchaSecretKey, response: input.captchaToken }) })
+      const result = await verification.json() as { success?: boolean }
+      if (!result.success) throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'CAPTCHA verification failed. Please try again.')
+    }
     const duplicateCutoff = new Date(Date.now() - 5 * 60 * 1000)
     const duplicate = await contactMessageRepository.findRecentDuplicate({
       email: input.email,
@@ -161,19 +169,21 @@ export const contactMessageService = {
       source: input.source ?? 'website',
     })
 
+    void sendAdminContactNotification(input).catch(() => undefined)
+
     return {
       ...created,
       status: toUiStatus(created.status),
     }
   },
 
-  async update(id: number, input: ContactMessageUpdateInput, userId?: number) {
+  async update(id: number, input: ContactMessageUpdateInput, _userId?: number) {
     const data: ContactMessageUpdateInput = {
       ...input,
       status: toDatabaseStatus(input.status),
     }
 
-    const updated = await baseContactMessageCrudService.update(id, withUpdateAudit(data, userId))
+    const updated = await baseContactMessageCrudService.update(id, data)
 
     return {
       ...updated,
@@ -183,5 +193,17 @@ export const contactMessageService = {
 
   async softDelete(id: number, userId?: number) {
     return baseContactMessageCrudService.remove(id, userId)
+  },
+
+  async reply(id: number, input: { message: string; subject?: string }) {
+    const message = await contactMessageRepository.findById(id)
+    if (!message) throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Contact message not found')
+    try {
+      await sendContactReply({ to: message.email, name: message.name, subject: input.subject || message.subject || undefined, message: input.message })
+    } catch {
+      throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Unable to send reply. Check SMTP settings and try again.')
+    }
+    const updated = await baseContactMessageCrudService.update(id, { status: 'RESOLVED' })
+    return { ...updated, status: 'REPLIED' }
   },
 }

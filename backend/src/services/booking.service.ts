@@ -449,6 +449,13 @@ export const bookingService = {
       customerName: updated.fullName,
       email: updated.email,
       phone: updated.phone,
+      reference: updated.slug || `SM-${updated.id}`,
+      bookingType: updated.bookingType,
+      title: updated.lesson?.title || updated.experience?.title || updated.event?.title || 'Surf booking',
+      bookingDate: updated.bookingDate,
+      preferredTime: updated.preferredTime,
+      participants: updated.participantCount,
+      price: (() => { const pricing = updated.metadata && typeof updated.metadata === 'object' && !Array.isArray(updated.metadata) ? (updated.metadata as { pricing?: { total?: number } }).pricing : undefined; return pricing?.total ?? null })(),
     })
 
     await auditLogService.record({

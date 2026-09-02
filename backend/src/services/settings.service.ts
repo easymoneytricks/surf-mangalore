@@ -12,6 +12,8 @@ function mergeSettings(raw: unknown): WebsiteSettings {
   return {
     ...DEFAULT_WEBSITE_SETTINGS,
     ...next,
+    security: { ...DEFAULT_WEBSITE_SETTINGS.security, ...(next.security ?? {}) },
+    email: { ...DEFAULT_WEBSITE_SETTINGS.email, ...(next.email ?? {}) },
     about: { ...DEFAULT_WEBSITE_SETTINGS.about, ...(next.about ?? {}) },
     experiencePage: { ...DEFAULT_WEBSITE_SETTINGS.experiencePage, ...(next.experiencePage ?? {}) },
     lessonPage: { ...DEFAULT_WEBSITE_SETTINGS.lessonPage, ...(next.lessonPage ?? {}) },
@@ -32,13 +34,23 @@ function mergeSettings(raw: unknown): WebsiteSettings {
 }
 
 export const settingsService = {
-  async getWebsiteSettings() {
+  async getWebsiteSettings(includeSecrets = false) {
     const record = await settingsRepository.findByKey(WEBSITE_SETTINGS_KEY)
-    return mergeSettings(record?.valueJson)
+    const settings = mergeSettings(record?.valueJson)
+    if (includeSecrets) return { ...settings, security: { ...settings.security, recaptchaSecretKey: '', hasRecaptchaSecretKey: Boolean(settings.security?.recaptchaSecretKey) }, email: { ...settings.email, smtpPassword: '', hasSmtpPassword: Boolean(settings.email?.smtpPassword) } }
+    return { ...settings, security: { ...settings.security, recaptchaSecretKey: undefined }, email: { ...settings.email, smtpPassword: undefined } }
   },
 
   async updateWebsiteSettings(payload: WebsiteSettings, userId?: number) {
-    const settings = mergeSettings(payload)
+    const existingRecord = await settingsRepository.findByKey(WEBSITE_SETTINGS_KEY)
+    const existing = mergeSettings(existingRecord?.valueJson)
+    const incoming = payload as any
+    const settings = mergeSettings({
+      ...existing,
+      ...incoming,
+      security: { ...existing.security, ...(incoming.security ?? {}), recaptchaSecretKey: incoming.security?.recaptchaSecretKey?.trim() || existing.security.recaptchaSecretKey },
+      email: { ...existing.email, ...(incoming.email ?? {}), smtpPassword: incoming.email?.smtpPassword?.trim() || existing.email.smtpPassword },
+    })
 
     await settingsRepository.upsertWebsiteSettings({
       settingKey: WEBSITE_SETTINGS_KEY,

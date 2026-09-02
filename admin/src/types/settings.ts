@@ -41,6 +41,8 @@ export type EventPageSettings = {
 export type GalleryPageSettings = { hero: { eyebrow: string; title: string; description: string; primaryCtaLabel: string; primaryCtaPath: string; secondaryCtaLabel: string; secondaryCtaPath: string; imageUrl: string; visualLabel: string; visualCardLabel: string; visualCardDescription: string } }
 
 export type WebsiteSettings = {
+  security: { recaptchaEnabled: boolean; recaptchaSiteKey: string; recaptchaSecretKey?: string; hasRecaptchaSecretKey?: boolean }
+  email: { enabled: boolean; smtpHost: string; smtpPort: number; smtpSecurity: 'none' | 'starttls' | 'ssl'; smtpUsername: string; smtpPassword?: string; hasSmtpPassword?: boolean; fromName: string; fromEmail: string; adminNotificationEmail: string; replyToEmail: string }
   about: AboutSettings
   experiencePage: ExperiencePageSettings
   lessonPage: LessonPageSettings

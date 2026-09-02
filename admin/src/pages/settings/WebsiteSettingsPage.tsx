@@ -20,6 +20,8 @@ type SettingsTab =
   | 'lessonPage'
   | 'eventPage'
   | 'galleryPage'
+  | 'security'
+  | 'email'
 
 const tabConfig: Array<{ key: SettingsTab; label: string }> = [
   { key: 'general', label: 'General' },
@@ -36,6 +38,8 @@ const tabConfig: Array<{ key: SettingsTab; label: string }> = [
   { key: 'lessonPage', label: 'Lesson Page' },
   { key: 'eventPage', label: 'Event Page' },
   { key: 'galleryPage', label: 'Gallery Page' },
+  { key: 'security', label: 'Security' },
+  { key: 'email', label: 'Email' },
 ]
 
 export default function WebsiteSettingsPage() {
@@ -53,7 +57,7 @@ export default function WebsiteSettingsPage() {
         setError(null)
         const data = await settingsService.get()
         const safeData = data && typeof data === 'object' ? data : DEFAULT_WEBSITE_SETTINGS
-        setSettings({ ...DEFAULT_WEBSITE_SETTINGS, ...safeData, about: normalizeAbout(safeData.about), experiencePage: normalizeExperiencePage(safeData.experiencePage), lessonPage: normalizeLessonPage(safeData.lessonPage), eventPage: normalizeEventPage(safeData.eventPage), galleryPage: normalizeGalleryPage(safeData.galleryPage), contact: normalizeContact(safeData.contact) })
+        setSettings({ ...DEFAULT_WEBSITE_SETTINGS, ...safeData, security: { ...DEFAULT_WEBSITE_SETTINGS.security, ...(safeData.security ?? {}) }, email: { ...DEFAULT_WEBSITE_SETTINGS.email, ...(safeData.email ?? {}) }, about: normalizeAbout(safeData.about), experiencePage: normalizeExperiencePage(safeData.experiencePage), lessonPage: normalizeLessonPage(safeData.lessonPage), eventPage: normalizeEventPage(safeData.eventPage), galleryPage: normalizeGalleryPage(safeData.galleryPage), contact: normalizeContact(safeData.contact) })
       } catch (loadError) {
         const message = loadError instanceof Error ? loadError.message : 'Failed to load settings'
         setError(message)
@@ -127,7 +131,7 @@ export default function WebsiteSettingsPage() {
       setSuccess(null)
       const saved = await settingsService.update(settings)
       const safeSaved = saved && typeof saved === 'object' ? saved : settings
-      setSettings({ ...DEFAULT_WEBSITE_SETTINGS, ...safeSaved, about: normalizeAbout(safeSaved.about), experiencePage: normalizeExperiencePage(safeSaved.experiencePage), lessonPage: normalizeLessonPage(safeSaved.lessonPage), eventPage: normalizeEventPage(safeSaved.eventPage), galleryPage: normalizeGalleryPage(safeSaved.galleryPage), contact: normalizeContact(safeSaved.contact) })
+      setSettings({ ...DEFAULT_WEBSITE_SETTINGS, ...safeSaved, security: { ...DEFAULT_WEBSITE_SETTINGS.security, ...(safeSaved.security ?? {}) }, email: { ...DEFAULT_WEBSITE_SETTINGS.email, ...(safeSaved.email ?? {}) }, about: normalizeAbout(safeSaved.about), experiencePage: normalizeExperiencePage(safeSaved.experiencePage), lessonPage: normalizeLessonPage(safeSaved.lessonPage), eventPage: normalizeEventPage(safeSaved.eventPage), galleryPage: normalizeGalleryPage(safeSaved.galleryPage), contact: normalizeContact(safeSaved.contact) })
       setSuccess('Website settings saved successfully.')
     } catch (saveError) {
       const message = saveError instanceof Error ? saveError.message : 'Failed to save settings'
@@ -210,6 +214,9 @@ export default function WebsiteSettingsPage() {
       {tab === 'lessonPage' && <LessonPageSettingsForm value={settings.lessonPage} onChange={(value) => update('lessonPage', value)} />}
       {tab === 'eventPage' && <EventPageSettingsForm value={settings.eventPage} onChange={(value) => update('eventPage', value)} />}
       {tab === 'galleryPage' && <GalleryPageSettingsForm value={settings.galleryPage} onChange={(value) => update('galleryPage', value)} />}
+
+      {tab === 'security' && <section className="grid gap-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-6 md:grid-cols-2"><label className="flex items-center gap-3 text-sm text-neutral-300"><input type="checkbox" checked={settings.security.recaptchaEnabled} onChange={(e) => update('security', { ...settings.security, recaptchaEnabled: e.target.checked })} />Enable Contact Form reCAPTCHA</label><Field label="reCAPTCHA Site Key" value={settings.security.recaptchaSiteKey} onChange={(value) => update('security', { ...settings.security, recaptchaSiteKey: value })} /><Field label="reCAPTCHA Secret Key" value={settings.security.recaptchaSecretKey || ''} onChange={(value) => update('security', { ...settings.security, recaptchaSecretKey: value })} /></section>}
+      {tab === 'email' && <section className="grid gap-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-6 md:grid-cols-2"><label className="flex items-center gap-3 text-sm text-neutral-300"><input type="checkbox" checked={settings.email.enabled} onChange={(e) => update('email', { ...settings.email, enabled: e.target.checked })} />Enable Email Notifications</label><Field label="SMTP Host" value={settings.email.smtpHost} onChange={(value) => update('email', { ...settings.email, smtpHost: value })} /><Field label="SMTP Port" value={String(settings.email.smtpPort)} onChange={(value) => update('email', { ...settings.email, smtpPort: Number(value) || 587 })} /><label className="text-sm text-neutral-300">Security<select className="mt-2 w-full rounded-xl border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-white" value={settings.email.smtpSecurity} onChange={(e) => update('email', { ...settings.email, smtpSecurity: e.target.value as WebsiteSettings['email']['smtpSecurity'] })}><option value="none">None</option><option value="starttls">STARTTLS/TLS</option><option value="ssl">SSL</option></select></label><Field label="SMTP Username" value={settings.email.smtpUsername} onChange={(value) => update('email', { ...settings.email, smtpUsername: value })} /><Field label="SMTP Password (leave blank to keep saved)" value={settings.email.smtpPassword || ''} onChange={(value) => update('email', { ...settings.email, smtpPassword: value })} /><Field label="From Name" value={settings.email.fromName} onChange={(value) => update('email', { ...settings.email, fromName: value })} /><Field label="From Email" value={settings.email.fromEmail} onChange={(value) => update('email', { ...settings.email, fromEmail: value })} /><Field label="Admin Notification Email" value={settings.email.adminNotificationEmail} onChange={(value) => update('email', { ...settings.email, adminNotificationEmail: value })} /><Field label="Reply-To Email (optional)" value={settings.email.replyToEmail} onChange={(value) => update('email', { ...settings.email, replyToEmail: value })} /><button type="button" className="rounded-full bg-cyan-500 px-4 py-2 text-sm font-semibold text-black" onClick={async () => { const recipient = window.prompt('Send test email to:'); if (!recipient) return; try { await settingsService.sendTestEmail(recipient); setSuccess('Test email sent successfully.') } catch (e) { setError(e instanceof Error ? e.message : 'Unable to send test email') } }}>Send Test Email</button></section>}
 
       {tab === 'contact' && (
         <section className="grid gap-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-6 md:grid-cols-2">

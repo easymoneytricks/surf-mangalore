@@ -1,6 +1,8 @@
 export const WEBSITE_SETTINGS_KEY = 'website_settings'
 
 export const DEFAULT_WEBSITE_SETTINGS = {
+  security: { recaptchaEnabled: false, recaptchaSiteKey: '', recaptchaSecretKey: '' },
+  email: { enabled: false, smtpHost: '', smtpPort: 587, smtpSecurity: 'starttls', smtpUsername: '', smtpPassword: '', fromName: 'Surf Mangalore', fromEmail: '', adminNotificationEmail: '', replyToEmail: '' },
   about: {},
   experiencePage: {},
   lessonPage: {},
