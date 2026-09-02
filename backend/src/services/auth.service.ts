@@ -8,6 +8,8 @@ import { authRepository } from '../repositories/auth.repository'
 import { auditLogService } from './audit-log.service'
 import { expiredTokenError, inactiveAccountError, invalidCredentialsError, unauthorizedError } from '../utils/auth-errors'
 import { type AuthUserResponse } from '../types/auth'
+import { ApiError } from '../utils/api-error'
+import { HTTP_STATUS } from '../constants/http'
 
 type AuthRequestMeta = {
   ipAddress?: string
@@ -51,6 +53,15 @@ function toAuthUserResponse(user: NonNullable<Awaited<ReturnType<typeof authRepo
 }
 
 export const authService = {
+  async changeOwnPassword(userId: number, input: { currentPassword: string; newPassword: string }, actorId?: number) {
+    const user = await authRepository.findAdminById(userId)
+    if (!user) throw new ApiError(HTTP_STATUS.NOT_FOUND, 'User not found')
+    const matches = await comparePassword(input.currentPassword, user.passwordHash)
+    if (!matches) throw new ApiError(HTTP_STATUS.UNAUTHORIZED, 'Current password is incorrect.')
+    const passwordHash = await hashPassword(input.newPassword)
+    await authRepository.updatePassword(userId, passwordHash)
+    await auditLogService.record({ actorId, action: 'UPDATE', resourceType: 'USER_PASSWORD', resourceId: String(userId), description: `${user.name} changed their password` })
+  },
   async login(input: LoginInput, meta: AuthRequestMeta) {
     const user = await authRepository.findAdminByEmail(input.email)
 

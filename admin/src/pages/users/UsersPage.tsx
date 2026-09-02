@@ -15,6 +15,7 @@ import {
   TextInput,
 } from '../../components/admin'
 import { useToast } from '../../contexts/ui/ToastContext'
+import { useAuth } from '../../contexts/AuthContext'
 import { usersService, type AdminUserRecord, type AdminUsersListParams, type AdminUserRole, type AdminUserStatus } from '../../services/users.service'
 
 const PAGE_SIZE = 8
@@ -55,6 +56,7 @@ function isProtectedUser(user: AdminUserRecord) {
 
 export default function UsersPage() {
   const { pushToast } = useToast()
+  const { user: currentAdmin } = useAuth()
   const [users, setUsers] = useState<AdminUserRecord[]>([])
   const [search, setSearch] = useState('')
   const [role, setRole] = useState('all')
@@ -68,6 +70,8 @@ export default function UsersPage() {
   const [editTarget, setEditTarget] = useState<AdminUserRecord | null>(null)
   const [saving, setSaving] = useState(false)
   const [provisioningOpen, setProvisioningOpen] = useState(false)
+  const [resetPassword, setResetPassword] = useState('')
+  const [resetPasswordConfirm, setResetPasswordConfirm] = useState('')
 
   const query = useMemo<AdminUsersListParams>(() => ({
     page,
@@ -164,6 +168,12 @@ export default function UsersPage() {
     } finally {
       setSaving(false)
     }
+  }
+
+  const handleResetPassword = async () => {
+    if (!editTarget || currentAdmin?.role !== 'SUPER_ADMIN') return
+    if (resetPassword.length < 8 || resetPassword !== resetPasswordConfirm) { pushToast(resetPassword.length < 8 ? 'Password must be at least 8 characters.' : 'Passwords do not match.', 'danger'); return }
+    try { await usersService.changePassword(editTarget.id, { password: resetPassword, mustChangePassword: false }); setResetPassword(''); setResetPasswordConfirm(''); pushToast('Password updated successfully', 'success') } catch (error) { pushToast(error instanceof Error ? error.message : 'Unable to update password', 'danger') }
   }
 
   return (
@@ -276,6 +286,9 @@ export default function UsersPage() {
             <SelectInput label="Role" value={editTarget.role} onChange={(value) => setEditTarget({ ...editTarget, role: value as AdminUserRole })} options={[{ label: 'Super Admin', value: 'SUPER_ADMIN' }, { label: 'Admin', value: 'ADMIN' }, { label: 'Editor', value: 'EDITOR' }, { label: 'Viewer', value: 'VIEWER' }]} disabled={isProtectedUser(editTarget)} />
             <SelectInput label="Status" value={editTarget.status} onChange={(value) => setEditTarget({ ...editTarget, status: value as AdminUserStatus })} options={[{ label: 'Active', value: 'active' }, { label: 'Inactive', value: 'inactive' }]} disabled={isProtectedUser(editTarget)} />
             <TextInput label="Avatar URL" value={editTarget.avatar || ''} onChange={(event) => setEditTarget({ ...editTarget, avatar: event.target.value || null })} />
+            {currentAdmin?.role === 'SUPER_ADMIN' && editTarget.id !== currentAdmin.id ? (
+              <div className="space-y-3 border-t border-white/10 pt-4"><p className="text-sm font-semibold text-(--color-text)">Security</p><TextInput label="Set New Password" type="password" value={resetPassword} onChange={(event) => setResetPassword(event.target.value)} /><TextInput label="Confirm New Password" type="password" value={resetPasswordConfirm} onChange={(event) => setResetPasswordConfirm(event.target.value)} /><SecondaryButton onClick={() => void handleResetPassword()} disabled={!resetPassword || !resetPasswordConfirm}>Reset Password</SecondaryButton></div>
+            ) : null}
           </div>
         ) : null}
       </Modal>

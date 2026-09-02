@@ -20,6 +20,9 @@ type AuthResponse = {
 }
 
 export const authService = {
+  changeOwnPassword(currentPassword: string, newPassword: string) {
+    return apiRequest<null>('/auth/password', { method: 'PATCH', body: JSON.stringify({ currentPassword, newPassword }) })
+  },
   async login(email: string, password: string) {
     try {
       return await apiRequest<AuthResponse>('/auth/login', {

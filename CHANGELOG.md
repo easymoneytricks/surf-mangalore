@@ -116,3 +116,5 @@
 - 2026-09-02: Corrected audit-log date filter contract and safe validation messaging; clarified actor input and permissions empty-state wording.
 - 2026-09-02: Standardized admin filter labels, updated Pages/dashboard/users/permissions wording, and added profile and provisioning-notes modal UX.
 - 2026-09-02: Added development-only safe Admin API diagnostics and removed duplicate Audit Logs pagination rendering.
+- 2026-09-02: Removed implicit GenericDataTable pagination so paginated admin modules use one API-backed pagination control each.
+- 2026-09-02: Added secure profile password change and Super Admin-only admin password reset flows without exposing password data.

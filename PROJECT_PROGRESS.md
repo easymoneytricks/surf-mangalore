@@ -492,3 +492,5 @@
 - Admin filter SearchBar controls now expose consistent visible SEARCH labels while the global header search remains unchanged.
 - Updated Admin wording for Pages, dashboard, users, and permissions; added read-only profile and provisioning-notes modals.
 - Admin API development requests now log method, URL, status, safe error code, and validation details; audit table uses API pagination as the sole visible paginator.
+- GenericDataTable no longer renders implicit pagination; server-paginated admin pages remain the sole owners of their API pagination controls, eliminating duplicate Previous/Page/Next controls.
+- Added authenticated self-service password changes from the Admin Profile modal and Super Admin-only password changes for other admin users using existing bcrypt/auth and audit-log infrastructure.

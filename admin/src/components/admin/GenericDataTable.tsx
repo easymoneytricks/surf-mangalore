@@ -36,7 +36,7 @@ export default function GenericDataTable<T>({
   onSelectionChange,
   rowActions,
   serverPaginationHint,
-  showPagination = true,
+  showPagination = false,
 }: GenericDataTableProps<T>) {
   const [sortBy, setSortBy] = useState<string | null>(null)
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')

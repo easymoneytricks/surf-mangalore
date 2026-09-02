@@ -63,3 +63,8 @@ export async function meController(req: Request, res: Response) {
     data: user,
   })
 }
+
+export async function changeOwnPasswordController(req: Request, res: Response) {
+  await authService.changeOwnPassword(req.authUser!.id, req.body, req.authUser!.id)
+  return sendSuccess(res, { statusCode: HTTP_STATUS.OK, message: 'Password changed successfully.', data: null })
+}

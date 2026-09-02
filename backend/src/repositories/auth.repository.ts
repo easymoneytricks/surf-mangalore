@@ -1,6 +1,9 @@
 import { prisma } from '../lib/prisma'
 
 export const authRepository = {
+  updatePassword(adminUserId: number, passwordHash: string) {
+    return prisma.adminUser.update({ where: { id: adminUserId }, data: { passwordHash, mustChangePassword: false } })
+  },
   findAdminByEmail(email: string) {
     return prisma.adminUser.findFirst({
       where: {

@@ -211,6 +211,12 @@ export const usersService = {
 
   async changePassword(id: number, input: UserResetPasswordInput, actorId?: number) {
     const existing = await ensureUser(id)
+    if (actorId && actorId !== id) {
+      const actor = await ensureUser(actorId)
+      if (actor.userRole !== 'SUPER_ADMIN') {
+        throw new ApiError(HTTP_STATUS.FORBIDDEN, 'Only SUPER_ADMIN can change another user password')
+      }
+    }
     const passwordHash = await hashPassword(input.password)
 
     const updated = await usersRepository.updatePassword(id, passwordHash, input.mustChangePassword ?? false)

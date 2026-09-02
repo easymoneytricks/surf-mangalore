@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { GLOBAL_SEARCH_STATIC_ITEMS } from '../constants/global-search'
 import { useAdminApp } from '../contexts/AdminAppContext'
 import { useAuth } from '../contexts/AuthContext'
+import { authService } from '../services/auth.service'
 import { useToast } from '../contexts/ui/ToastContext'
 import { Breadcrumbs, IconButton, Modal, SearchBar, SecondaryButton } from './admin'
 
@@ -31,6 +32,11 @@ export default function TopNavigation({ onToggleSidebar, onToggleCollapse, isCol
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [passwordMessage, setPasswordMessage] = useState<string | null>(null)
+  const [passwordSaving, setPasswordSaving] = useState(false)
 
   const searchResults = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -55,6 +61,13 @@ export default function TopNavigation({ onToggleSidebar, onToggleCollapse, isCol
       navigate('/login', { replace: true })
       pushToast('Logged out successfully', 'info')
     })
+  }
+
+  const handlePasswordChange = async () => {
+    if (newPassword !== confirmPassword) { setPasswordMessage('New passwords do not match.'); return }
+    if (newPassword.length < 8) { setPasswordMessage('Password must be at least 8 characters.'); return }
+    setPasswordSaving(true); setPasswordMessage(null)
+    try { await authService.changeOwnPassword(currentPassword, newPassword); setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); setPasswordMessage('Password changed successfully.') } catch (error) { setPasswordMessage(error instanceof Error ? error.message : 'Unable to change password.') } finally { setPasswordSaving(false) }
   }
 
   return (
@@ -210,6 +223,16 @@ export default function TopNavigation({ onToggleSidebar, onToggleCollapse, isCol
           <p><span className="font-medium text-(--color-text)">Email:</span> {currentUser.email}</p>
           <p><span className="font-medium text-(--color-text)">Role:</span> {currentUser.role.replaceAll('_', ' ')}</p>
           <p><span className="font-medium text-(--color-text)">Account status:</span> {user?.status || 'active'}</p>
+          <div className="mt-5 border-t border-white/10 pt-4">
+            <p className="mb-3 text-sm font-semibold text-(--color-text)">Change Password</p>
+            <div className="space-y-3">
+              <input aria-label="Current Password" type="password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} placeholder="Current password" className="h-10 w-full rounded-xl border border-white/15 bg-white/6 px-3 text-sm text-(--color-text)" />
+              <input aria-label="New Password" type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} placeholder="New password" className="h-10 w-full rounded-xl border border-white/15 bg-white/6 px-3 text-sm text-(--color-text)" />
+              <input aria-label="Confirm New Password" type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} placeholder="Confirm new password" className="h-10 w-full rounded-xl border border-white/15 bg-white/6 px-3 text-sm text-(--color-text)" />
+              {passwordMessage ? <p className="text-xs text-(--color-text-secondary)">{passwordMessage}</p> : null}
+              <SecondaryButton onClick={() => void handlePasswordChange()} disabled={passwordSaving || !currentPassword || !newPassword || !confirmPassword}>{passwordSaving ? 'Saving...' : 'Change Password'}</SecondaryButton>
+            </div>
+          </div>
         </div>
       </Modal>
     </header>
