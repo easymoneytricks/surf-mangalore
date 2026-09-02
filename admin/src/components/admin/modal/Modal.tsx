@@ -15,7 +15,7 @@ export default function Modal({ isOpen, title, children, onClose, footer }: Moda
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm" role="presentation">
-      <div role="dialog" aria-modal="true" aria-label={title} className="admin-card max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-2xl bg-[rgba(7,27,39,0.98)] p-6 shadow-2xl">
+      <div role="dialog" aria-modal="true" aria-label={title} className="admin-card !bg-[#071b27] max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-2xl p-6 shadow-2xl">
         <div className="mb-4 flex items-start justify-between gap-3">
           <h3 className="text-lg font-semibold text-(--color-text)">{title}</h3>
           <button type="button" onClick={onClose} className="rounded-full border border-white/20 px-2 py-1 text-xs text-(--color-text-secondary)">Close</button>

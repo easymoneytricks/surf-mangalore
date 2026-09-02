@@ -71,6 +71,7 @@ export default function TopNavigation({ onToggleSidebar, onToggleCollapse, isCol
   }
 
   return (
+    <>
     <header className="admin-surface sticky top-0 z-30 mb-6 flex min-h-(--admin-topbar-height) items-center justify-between gap-3 rounded-2xl px-3 py-2 sm:px-4">
       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         <button
@@ -217,6 +218,7 @@ export default function TopNavigation({ onToggleSidebar, onToggleCollapse, isCol
           ) : null}
         </div>
       </div>
+      </header>
       <Modal isOpen={profileOpen} title="Admin Profile" onClose={() => setProfileOpen(false)} footer={<div className="flex justify-end"><SecondaryButton onClick={() => setProfileOpen(false)}>Close</SecondaryButton></div>}>
         <div className="space-y-2 text-sm text-(--color-text-secondary)">
           <p><span className="font-medium text-(--color-text)">Name:</span> {currentUser.name}</p>
@@ -235,6 +237,6 @@ export default function TopNavigation({ onToggleSidebar, onToggleCollapse, isCol
           </div>
         </div>
       </Modal>
-    </header>
+    </>
   )
 }
