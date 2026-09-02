@@ -34,17 +34,21 @@ function mergeSettings(raw: unknown): WebsiteSettings {
 }
 
 export const settingsService = {
-  async getWebsiteSettings(includeSecrets = false) {
+  async getStoredWebsiteSettings() {
     const record = await settingsRepository.findByKey(WEBSITE_SETTINGS_KEY)
-    const settings = mergeSettings(record?.valueJson)
+    return mergeSettings(record?.valueJson)
+  },
+
+  async getWebsiteSettings(includeSecrets = false) {
+    const settings = await this.getStoredWebsiteSettings()
     if (includeSecrets) return { ...settings, security: { ...settings.security, recaptchaSecretKey: '', hasRecaptchaSecretKey: Boolean(settings.security?.recaptchaSecretKey) }, email: { ...settings.email, smtpPassword: '', hasSmtpPassword: Boolean(settings.email?.smtpPassword) } }
-    return { ...settings, security: { ...settings.security, recaptchaSecretKey: undefined }, email: { ...settings.email, smtpPassword: undefined } }
+    return { ...settings, security: { recaptchaEnabled: settings.security?.recaptchaEnabled, recaptchaSiteKey: settings.security?.recaptchaSiteKey }, email: undefined }
   },
 
   async updateWebsiteSettings(payload: WebsiteSettings, userId?: number) {
     const existingRecord = await settingsRepository.findByKey(WEBSITE_SETTINGS_KEY)
     const existing = mergeSettings(existingRecord?.valueJson)
-    const incoming = payload as any
+    const incoming: Partial<WebsiteSettings> = payload
     const settings = mergeSettings({
       ...existing,
       ...incoming,

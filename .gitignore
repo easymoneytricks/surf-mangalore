@@ -9,8 +9,21 @@ lerna-debug.log*
 
 node_modules
 .local-db/
+*.dump
+*.backup
+*.sql
+!backend/prisma/migrations/**/*.sql
+backups/
 dist
 dist-ssr
+build
+coverage
+.cache
+.vite
+.vercel
+uploads/
+tmp/
+temp/
 *.local
 .env
 .env.*

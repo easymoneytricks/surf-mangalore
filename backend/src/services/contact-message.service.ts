@@ -137,7 +137,7 @@ export const contactMessageService = {
   },
 
   async create(input: ContactMessageCreateInput) {
-    const security = (await settingsService.getWebsiteSettings(true)).security
+    const security = (await settingsService.getStoredWebsiteSettings()).security
     if (security.recaptchaEnabled) {
       if (!input.captchaToken || !security.recaptchaSecretKey) throw new ApiError(HTTP_STATUS.BAD_REQUEST, 'Please complete the CAPTCHA verification.')
       const verification = await fetch('https://www.google.com/recaptcha/api/siteverify', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ secret: security.recaptchaSecretKey, response: input.captchaToken }) })

@@ -76,7 +76,7 @@ Development-only:
 Database pooler guidance:
 
 - `DATABASE_URL`: use the Supabase Transaction Pooler URL on port `6543` for the Vercel serverless runtime, with the provider-recommended `pgbouncer=true` and `connection_limit=1` parameters.
-- `DIRECT_URL`: not used by the current Prisma schema. Use the Supabase Session Pooler URL on port `5432` only as a temporary `DATABASE_URL` in a controlled migration shell; do not add `directUrl` or `DIRECT_URL` unless Prisma configuration is deliberately changed and tested.
+- `DIRECT_URL`: used by the current Prisma datasource for migration administration. Set it to the Supabase direct/session connection (normally port `5432`), never expose it to frontend projects.
 
 When media upload is enabled, all three Cloudinary variables are required. The Cloudinary API secret is backend-only and must never be added to frontend `VITE_*` variables, browser configuration, logs, or API responses.
 
@@ -141,11 +141,11 @@ Use the Supabase PostgreSQL connection string, for example:
 
 Do not commit real credentials.
 
-The current Prisma 6 schema uses `DATABASE_URL` only. It does not declare `directUrl`, and this repository has no `prisma.config.*` or `DIRECT_URL` usage. Do not add a second Prisma URL solely for this configuration pass.
+The current Prisma 6 schema declares both `DATABASE_URL` and `directUrl = env("DIRECT_URL")`. Use the runtime pooler in `DATABASE_URL` and the direct/session connection in `DIRECT_URL` for Prisma migration operations.
 
 For the Vercel backend runtime, set `DATABASE_URL` to the Supabase Transaction Pooler URL on port `6543`, using the provider-recommended `pgbouncer=true` and `connection_limit=1` parameters. For Prisma migration administration, use the Supabase Session Pooler URL on port `5432` by temporarily supplying it as `DATABASE_URL` in a controlled migration shell, then restore the runtime value. Never put the pooler password in Git or frontend variables.
 
-For local development, keep the existing ignored `backend/.env` Supabase configuration working. To switch local runtime from the current direct URL to the Transaction Pooler, manually replace only its `DATABASE_URL` value with the operator-supplied Transaction Pooler URL. Do not change `schema.prisma` or migrations.
+For local development, the ignored `backend/.env` points to the local PostgreSQL instance. Keep local and production URLs separate; configure Supabase values only in the production environment.
 
 Current temporary backend origins:
 

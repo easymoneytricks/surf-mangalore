@@ -13,6 +13,9 @@
 - Added branded customer booking-status emails for CONFIRMED, COMPLETED, and CANCELLED transitions. Emails are sent after the status update and include the booking reference, product, schedule, participants, pricing, and pay-on-ground notice.
 - Fixed Contact Messages status persistence by removing the invalid generic `updatedBy` relation payload; Mark as read, Archive, and Restore now update successfully. Inbox rows now have clearer vertical spacing.
 - Pre-deployment security review completed: production JWT/origin/cookie safeguards, Helmet, CORS allowlist, auth throttling, secret redaction, and public settings secret stripping verified. Settings update responses were corrected to remain secret-safe.
+- Fixed SMTP test-email delivery to read stored credentials through an internal-only settings path while keeping admin/public responses masked; public settings no longer expose SMTP host or username.
+- Refined booking-status email copy: completed bookings thank the customer, cancelled bookings apologise for the inconvenience, and Pay on Ground appears only for confirmed bookings.
+- Production deployment preparation completed: expanded repository ignore rules, audited tracked secret-like assignments, documented environment/database/Vercel procedures, and added FINAL_DEPLOYMENT_GUIDE.md. No Supabase data transfer or production migration was executed.
 
 - Home page implemented with premium storytelling sections and polished conversion flow.
 - Experiences page implemented with data-driven discovery, comparison, FAQ, and CTA structure.
